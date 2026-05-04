@@ -30,6 +30,8 @@ const NAV_LINKS = [
   { href: "/venues",        label: "Venues" },
   { href: "/campaigns",     label: "Campaigns" },
   { href: "/pricing",       label: "Pricing" },
+  { href: "/demo",          label: "Demo" },
+  { href: "/case-studies",  label: "Case Studies" },
   { href: "/proposals",     label: "Proposals" },
   { href: "/billing",       label: "Billing" },
   { href: "/analytics",     label: "Analytics" },

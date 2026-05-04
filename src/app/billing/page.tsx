@@ -190,34 +190,88 @@ export default function BillingPage() {
         )}
       </section>
 
-      {/* Payment Methods */}
-      <section className="grid md:grid-cols-3 gap-4">
-        {[
-          {
-            icon: "◼", name: "Square",
-            desc: "Accept cards and ACH via Square. Set SQUARE_ACCESS_TOKEN in .env.local.",
-            status: "Not configured", color: "border-slate-700",
-          },
-          {
-            icon: "⚡", name: "Stripe",
-            desc: "Invoicing, subscriptions, and card payments via Stripe. Set STRIPE_SECRET_KEY.",
-            status: "Not configured", color: "border-slate-700",
-          },
-          {
-            icon: "📋", name: "Manual",
-            desc: "Track manual payments, checks, and wire transfers. Always available.",
-            status: "Active", color: "border-green-500/40",
-          },
-        ].map(m => (
-          <div key={m.name} className={`card-dark rounded-xl p-4 border ${m.color} space-y-2`}>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{m.icon}</span>
-              <span className="text-white font-semibold text-sm">{m.name}</span>
-              <span className={`ml-auto text-[10px] font-bold ${m.status === "Active" ? "text-green-400" : "text-slate-500"}`}>{m.status}</span>
+      {/* Payment Provider Panel */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-white font-bold text-sm uppercase tracking-widest">Payment Providers</h2>
+          <span className="text-slate-600 text-xs">Configure in .env.local</span>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+
+          {/* Square */}
+          <div className="card-dark rounded-xl border border-slate-700 overflow-hidden">
+            <div className="border-b border-[#162035] px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-white text-xs font-black">SQ</div>
+                <span className="text-white font-semibold text-sm">Square</span>
+              </div>
+              <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>
             </div>
-            <p className="text-slate-500 text-xs">{m.desc}</p>
+            <div className="p-4 space-y-3">
+              <p className="text-slate-500 text-xs">Accept card payments and ACH via Square point-of-sale and invoicing API.</p>
+              <div className="space-y-1">
+                <p className="text-slate-600 text-[10px] uppercase tracking-widest">Required env var</p>
+                <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">SQUARE_ACCESS_TOKEN</code>
+              </div>
+              <button disabled className="w-full px-3 py-2 bg-slate-800 text-slate-600 rounded-lg text-xs font-semibold cursor-not-allowed border border-slate-700">
+                Create Payment Link — Not configured
+              </button>
+            </div>
           </div>
-        ))}
+
+          {/* Stripe */}
+          <div className="card-dark rounded-xl border border-slate-700 overflow-hidden">
+            <div className="border-b border-[#162035] px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-purple-400 text-xs font-black">ST</div>
+                <span className="text-white font-semibold text-sm">Stripe</span>
+              </div>
+              <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-slate-500 text-xs">Invoicing, subscriptions, and card payments via Stripe. Supports recurring billing.</p>
+              <div className="space-y-1">
+                <p className="text-slate-600 text-[10px] uppercase tracking-widest">Required env vars</p>
+                <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">STRIPE_SECRET_KEY</code>
+                <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">STRIPE_PUBLISHABLE_KEY</code>
+              </div>
+              <button disabled className="w-full px-3 py-2 bg-slate-800 text-slate-600 rounded-lg text-xs font-semibold cursor-not-allowed border border-slate-700">
+                Create Payment Link — Not configured
+              </button>
+            </div>
+          </div>
+
+          {/* Manual */}
+          <div className="card-dark rounded-xl border border-green-500/30 overflow-hidden">
+            <div className="border-b border-[#162035] px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded bg-green-500/10 flex items-center justify-center text-green-400 text-xs font-black border border-green-500/20">M</div>
+                <span className="text-white font-semibold text-sm">Manual</span>
+              </div>
+              <span className="text-[10px] font-bold text-green-400 border border-green-500/30 bg-green-500/10 px-2 py-0.5 rounded">Active</span>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-slate-500 text-xs">Track manual payments, checks, wire transfers, and cash. Always available without configuration.</p>
+              <div className="space-y-1">
+                <p className="text-slate-600 text-[10px] uppercase tracking-widest">Supports</p>
+                <p className="text-slate-400 text-xs">Check, Wire, ACH, Cash, TROPTIONS</p>
+              </div>
+              <button
+                onClick={() => alert("Manual payment recording — connect to /api/invoices PATCH in a full implementation.")}
+                className="w-full px-3 py-2 bg-green-500/10 text-green-400 rounded-lg text-xs font-semibold hover:bg-green-500/20 transition-colors border border-green-500/20">
+                Record Manual Payment
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-[#162035] px-4 py-3 flex items-start gap-2">
+          <span className="text-[#00d4ff] text-sm shrink-0">i</span>
+          <p className="text-slate-500 text-xs leading-relaxed">
+            To enable Square or Stripe, add the required keys to <code className="text-slate-400">.env.local</code> and restart the dev server. See <code className="text-slate-400">docs/DEPLOYMENT_ENVIRONMENT_GUIDE.md</code> for setup instructions.
+          </p>
+        </div>
       </section>
 
     </div>

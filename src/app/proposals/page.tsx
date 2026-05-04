@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Package { id: string; name: string; monthlyFee: number; setupFee: number; }
+interface Package { id: string; name: string; monthlyFee: number; setupFee: number; tier: string; includedServices: string; }
 interface Sponsor { id: string; name: string; }
 interface Venue   { id: string; name: string; city: string; }
 
@@ -164,24 +164,81 @@ export default function ProposalsPage() {
               </div>
             </div>
 
-            {/* Live Estimate */}
+            {/* Proposal Preview Card */}
             {selectedPkg && (
-              <div className="rounded-xl bg-[#050810] border border-[#00d4ff]/30 p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-slate-500 text-xs">Package</p>
-                  <p className="text-white font-semibold text-sm">{selectedPkg.name}</p>
+              <div className="rounded-2xl bg-[#050810] border border-[#00d4ff]/30 overflow-hidden">
+                <div className="border-b border-[#162035] px-5 py-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#00d4ff] text-xs font-bold uppercase tracking-widest">Proposal Preview</span>
+                    {selectedPkg.tier && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                        selectedPkg.tier === "enterprise" ? "text-purple-400 border-purple-400/30 bg-purple-400/10"
+                        : selectedPkg.tier === "featured"  ? "text-[#d4a017] border-[#d4a017]/30 bg-[#d4a017]/10"
+                        : "text-slate-400 border-slate-700 bg-slate-800"
+                      }`}>{selectedPkg.tier.toUpperCase()}</span>
+                    )}
+                  </div>
+                  <span className="text-slate-600 text-[10px]">Not yet saved</span>
                 </div>
-                <div>
-                  <p className="text-slate-500 text-xs">Monthly Fee</p>
-                  <p className="text-[#00d4ff] font-bold">{fmt(selectedPkg.monthlyFee)}</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 text-xs">Term Value</p>
-                  <p className="text-[#d4a017] font-bold">{fmt(selectedPkg.monthlyFee * months)}</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 text-xs">Total Contract Value</p>
-                  <p className="text-green-400 font-bold text-lg">{fmt(totalBase)}</p>
+
+                <div className="p-5 space-y-5">
+                  {/* Key Numbers */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-[#0a0f1e] rounded-xl p-3 border border-[#162035]">
+                      <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">Package</p>
+                      <p className="text-white font-semibold text-sm leading-tight">{selectedPkg.name}</p>
+                    </div>
+                    <div className="bg-[#0a0f1e] rounded-xl p-3 border border-[#162035]">
+                      <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">Monthly Fee</p>
+                      <p className="text-[#00d4ff] font-bold text-base">{fmt(selectedPkg.monthlyFee)}</p>
+                    </div>
+                    <div className="bg-[#0a0f1e] rounded-xl p-3 border border-[#162035]">
+                      <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">Setup Fee</p>
+                      <p className="text-[#d4a017] font-bold text-base">{fmt(selectedPkg.setupFee)}</p>
+                    </div>
+                    <div className="bg-[#0a0f1e] rounded-xl p-3 border border-[#00d4ff]/30">
+                      <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">Total Contract Value</p>
+                      <p className="text-green-400 font-black text-lg">{fmt(totalBase)}</p>
+                      <p className="text-slate-600 text-[10px]">{fmt(selectedPkg.monthlyFee)}/mo × {months} + {fmt(selectedPkg.setupFee)}</p>
+                    </div>
+                  </div>
+
+                  {/* Context */}
+                  <div className="grid md:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-slate-600 text-[10px] uppercase tracking-widest">Sponsor</p>
+                      <p className="text-white text-sm">{sponsors.find(s => s.id === form.sponsorId)?.name ?? <span className="text-slate-500 italic">Not selected</span>}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-slate-600 text-[10px] uppercase tracking-widest">Venue</p>
+                      <p className="text-white text-sm">{venues.find(v => v.id === form.venueId)?.name ?? <span className="text-slate-500 italic">Not selected</span>}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-slate-600 text-[10px] uppercase tracking-widest">Campaign Type / Term</p>
+                      <p className="text-white text-sm capitalize">{form.campaignType} — {months} months</p>
+                    </div>
+                  </div>
+
+                  {/* Included Services */}
+                  {(() => {
+                    let services: string[] = [];
+                    try { services = JSON.parse(selectedPkg.includedServices); } catch {}
+                    return services.length > 0 ? (
+                      <div className="space-y-2">
+                        <p className="text-slate-600 text-[10px] uppercase tracking-widest">Included Services</p>
+                        <div className="flex flex-wrap gap-2">
+                          {services.map((s: string) => (
+                            <span key={s} className="text-[11px] bg-[#162035] text-slate-300 px-2 py-1 rounded-lg border border-[#162035]">{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  <div className="flex items-center gap-2 border border-[#162035] rounded-lg px-4 py-2.5">
+                    <span className="text-[#d4a017] text-sm">↓</span>
+                    <p className="text-slate-500 text-xs">Save this proposal to prepare it for PDF export and sharing with the sponsor.</p>
+                  </div>
                 </div>
               </div>
             )}
