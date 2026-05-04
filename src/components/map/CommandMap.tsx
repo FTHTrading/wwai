@@ -3,6 +3,9 @@
 import { useMemo, useState } from "react";
 import { ALL_PLACES, ZONES } from "@/data/demoData";
 import type { Place } from "@/lib/types";
+import LiveMap from "@/components/map/LiveMap";
+import { CATEGORY_COLOR, PRIMARY_VENUE, placeCoords } from "@/lib/maps/zones";
+import { readProviderConfig, type MapMarker } from "@/lib/maps/provider";
 
 const LAYERS: { id: Place["category"]; label: string; color: string }[] = [
   { id: "hotel",      label: "Hotels",         color: "#00d5ff" },
@@ -24,6 +27,19 @@ export default function CommandMap() {
     [active, zoneFilter]
   );
 
+  const provider = readProviderConfig().outdoor;
+  const liveMarkers: MapMarker[] = useMemo(
+    () =>
+      filtered.map((p) => ({
+        id: p.id,
+        position: placeCoords(p),
+        label: p.name,
+        color: CATEGORY_COLOR[p.category] || "#00d5ff",
+        category: p.category,
+      })),
+    [filtered]
+  );
+
   // Position pins on a synthetic 100x100 grid keyed off zone + index.
   const zonePos: Record<string, { x: number; y: number }> = {
     Downtown:   { x: 50, y: 60 },
@@ -36,8 +52,12 @@ export default function CommandMap() {
 
   return (
     <div className="grid lg:grid-cols-[1fr_320px] gap-4">
-      <div className="wwai-panel p-3 relative overflow-hidden hud-grid-bg" style={{ minHeight: 520 }}>
-        <div className="absolute inset-0 pointer-events-none">
+      <div className="space-y-3">
+        {provider !== "demo" && (
+          <LiveMap center={PRIMARY_VENUE} zoom={12} markers={liveMarkers} height={520} />
+        )}
+        <div className="wwai-panel p-3 relative overflow-hidden hud-grid-bg" style={{ minHeight: provider === "demo" ? 520 : 240 }}>
+          <div className="absolute inset-0 pointer-events-none">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full opacity-30">
             <line x1="50" y1="60" x2="42" y2="50" stroke="#00d5ff" strokeWidth="0.3" />
             <line x1="50" y1="60" x2="55" y2="30" stroke="#00d5ff" strokeWidth="0.3" />
@@ -69,7 +89,12 @@ export default function CommandMap() {
             {z}
           </div>
         ))}
-        <div className="absolute bottom-3 left-3 disclaimer-bar">Demo visualization. Production requires a live map/routing provider.</div>
+        <div className="absolute bottom-3 left-3 disclaimer-bar">
+          {provider === "demo"
+            ? "Demo visualization. Set NEXT_PUBLIC_MAP_PROVIDER=maplibre for a live OSM map."
+            : `Live provider: ${provider}. Demo grid retained as fallback view.`}
+        </div>
+      </div>
       </div>
 
       <div className="space-y-3">

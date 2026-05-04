@@ -1,5 +1,6 @@
 import AppShell from "@/components/layout/AppShell";
 import SafetyRoutePlanner from "@/components/map/SafetyRoutePlanner";
+import VenueMap from "@/components/map/VenueMap";
 
 export default function SafetyRoutesPage() {
   return (
@@ -15,6 +16,9 @@ export default function SafetyRoutesPage() {
         emergencies, contact local emergency services immediately.
       </div>
       <SafetyRoutePlanner />
+      <div className="mt-6">
+        <VenueMap venueName="Primary venue (demo)" focus={{ gate: "Gate 3", section: "114", seat: "Row K, Seat 12" }} />
+      </div>
     </AppShell>
   );
 }

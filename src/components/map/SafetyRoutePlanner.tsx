@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ALL_PLACES, HOTELS, TRANSPORT, LANGUAGES } from "@/data/demoData";
 import type { Place } from "@/lib/types";
 import { estimateDriveMinutes, estimateShuttleMinutes, estimateWalkMinutes, formatDistance } from "@/lib/distance";
+import { getOutdoorAdapter, readProviderConfig, type RouteResult } from "@/lib/maps/provider";
+import { PRIMARY_VENUE, placeCoords } from "@/lib/maps/zones";
 
 const TRAVEL_MODES = ["walk", "shuttle", "driver", "rideshare"] as const;
 type TravelMode = typeof TRAVEL_MODES[number];
@@ -31,10 +33,41 @@ export default function SafetyRoutePlanner() {
   const start = startOptions.find((s) => s.id === startId)!;
 
   const distance = start.distanceMiles;
-  const minutes =
+  const estMinutes =
     mode === "walk"     ? estimateWalkMinutes(distance) :
     mode === "shuttle"  ? estimateShuttleMinutes(distance) :
     estimateDriveMinutes(distance);
+
+  // Live route via configured map provider (when enabled).
+  const provider = readProviderConfig().outdoor;
+  const [liveRoute, setLiveRoute] = useState<RouteResult | null>(null);
+  const [routing, setRouting] = useState(false);
+  useEffect(() => {
+    if (provider === "demo") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLiveRoute(null);
+      return;
+    }
+    let cancelled = false;
+    setRouting(true);
+    (async () => {
+      try {
+        const adapter = await getOutdoorAdapter();
+        if (!adapter) return;
+        const routeMode = mode === "walk" ? "walking" : "driving";
+        const r = await adapter.route({ from: placeCoords(start), to: PRIMARY_VENUE, mode: routeMode });
+        if (!cancelled) setLiveRoute(r);
+      } catch {
+        if (!cancelled) setLiveRoute(null);
+      } finally {
+        if (!cancelled) setRouting(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [provider, startId, mode, start]);
+
+  const distanceLabel  = liveRoute ? `${(liveRoute.distanceMeters / 1609.34).toFixed(2)} mi` : formatDistance(distance);
+  const minutesLabel   = liveRoute ? `${Math.max(1, Math.round(liveRoute.durationSeconds / 60))} min` : `${estMinutes} min`;
 
   const checkpoints = [
     `Exit ${start.name}`,
@@ -103,10 +136,17 @@ export default function SafetyRoutePlanner() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <Stat label="Distance" value={formatDistance(distance)} />
-          <Stat label="Est. time" value={`${minutes} min`} />
+          <Stat label="Distance" value={distanceLabel} />
+          <Stat label="Est. time" value={minutesLabel} />
           <Stat label="Mode" value={mode} />
         </div>
+
+        {provider !== "demo" && (
+          <div className="text-[11px] text-cyan-300/80">
+            {routing ? "Computing live route…" : liveRoute ? `Live route via ${liveRoute.provider}.` : "Live route unavailable — showing estimate."}
+            {liveRoute?.notes && <span className="text-slate-500"> · {liveRoute.notes}</span>}
+          </div>
+        )}
 
         <div>
           <div className="text-xs uppercase tracking-widest text-slate-500 mb-2">Checkpoints</div>
@@ -129,7 +169,11 @@ export default function SafetyRoutePlanner() {
         <div className="flex flex-wrap gap-2">
           <button className="wwai-btn-primary text-sm">Generate QR Route Pass (demo)</button>
           <button className="wwai-btn-ghost text-sm">Send to Driver Pickup Zone</button>
-          <button className="wwai-btn-disabled text-sm" disabled>Live Map Provider — needs config</button>
+          {provider === "demo" ? (
+            <button className="wwai-btn-disabled text-sm" disabled>Live Map Provider — needs config</button>
+          ) : (
+            <span className="wwai-chip wwai-chip-cyan text-xs">Live Provider: {provider}</span>
+          )}
         </div>
 
         <p className="disclaimer-bar">
