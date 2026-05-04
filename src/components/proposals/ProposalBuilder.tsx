@@ -196,9 +196,11 @@ export default function ProposalBuilder({ initialPackageId }: { initialPackageId
             </ul>
           </div>
         )}
-        <div className="flex gap-2 pt-3">
+        <div className="flex gap-2 pt-3 flex-wrap">
           <button onClick={handleSave} className="wwai-btn-primary text-sm">Save Demo Proposal</button>
+          <button onClick={() => typeof window !== "undefined" && window.print()} className="wwai-btn-ghost text-sm">Print Preview</button>
           <a href="/contact" className="wwai-btn-ghost text-sm">Contact Sales</a>
+          <a href="/billing" className="wwai-btn-ghost text-sm">View Billing</a>
           <button className="wwai-btn-disabled text-sm" disabled title="PDF export future-ready">PDF Export</button>
         </div>
         {savedId && (
