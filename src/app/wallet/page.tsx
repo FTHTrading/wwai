@@ -27,7 +27,6 @@ export default function WalletPage() {
         body: JSON.stringify({ address: address.trim(), chain, displayName: displayName.trim() || undefined }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const user = await res.json();
       // Fetch with live ATP balance
       const full = await fetch(`/api/users?address=${encodeURIComponent(address.trim())}`);
       setProfile(await full.json());

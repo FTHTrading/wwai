@@ -4,8 +4,6 @@
  */
 import prisma from "./prisma";
 
-const FUTBIN_SEARCH = "https://www.futbin.com/search?year=24&term=";
-
 export interface CardSearchResult {
   eaId: string;
   name: string;
