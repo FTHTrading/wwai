@@ -1,16 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Tab = "leads" | "team" | "comms" | "payment";
 
-const LEADS = [
-  { id: "L001", biz: "Marlins Park Concessions",   contact: "+13055550123", status: "hot",  value: "$8,500",  last: "2h ago" },
-  { id: "L002", biz: "Wynwood Brewery",             contact: "+13055550178", status: "warm", value: "$3,200",  last: "1d ago" },
-  { id: "L003", biz: "South Beach Hotel Group",     contact: "+13055550234", status: "hot",  value: "$15,000", last: "4h ago" },
-  { id: "L004", biz: "Bayside Marketplace",         contact: "+17865550890", status: "cold", value: "$2,100",  last: "3d ago" },
-  { id: "L005", biz: "Miami Dolphins Shop",         contact: "+13055550312", status: "warm", value: "$6,700",  last: "6h ago" },
-  { id: "L006", biz: "Brickell City Centre",        contact: "+13055550445", status: "hot",  value: "$22,000", last: "30m ago" },
-];
+interface DbLead {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  status: string;
+  estimatedValue: number | null;
+  createdAt: string;
+}
 
 const REPS = [
   { id: "r1", name: "Marcus Webb",  territory: "Miami / SE Florida",    deals: 12, commission: "$4,200", status: "active" },
@@ -27,15 +29,17 @@ const TXNS = [
 ];
 
 function statusBadge(s: string) {
-  return s === "hot"
+  return s === "hot" || s === "new"
     ? "text-red-400 bg-red-400/10 border-red-400/30"
-    : s === "warm"
+    : s === "warm" || s === "contacted"
     ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/30"
     : "text-gray-400 bg-gray-800 border-gray-700";
 }
 
 export default function SalesPage() {
   const [activeTab,  setActiveTab]  = useState<Tab>("leads");
+  const [leads,      setLeads]      = useState<DbLead[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(true);
   const [smsPhone,   setSmsPhone]   = useState("");
   const [smsMsg,     setSmsMsg]     = useState("");
   const [smsSent,    setSmsSent]    = useState(false);
@@ -45,6 +49,14 @@ export default function SalesPage() {
   const [payDesc,    setPayDesc]    = useState("");
   const [payLink,    setPayLink]    = useState("");
   const [payLoading, setPayLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/leads")
+      .then(r => r.json())
+      .then(d => setLeads(Array.isArray(d) ? d : []))
+      .catch(console.error)
+      .finally(() => setLeadsLoading(false));
+  }, []);
 
   async function sendSms() {
     if (!smsPhone || !smsMsg) return;
@@ -159,37 +171,40 @@ export default function SalesPage() {
       {/* ── Lead Tracker ── */}
       {activeTab === "leads" && (
         <div className="space-y-3">
-          {LEADS.map((lead) => (
+          {leadsLoading && <p className="text-slate-500 text-sm text-center py-6">Loading leads…</p>}
+          {!leadsLoading && leads.map((lead) => (
             <div key={lead.id} className="card-dark-hover rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <span className={`text-xs font-bold px-2 py-1 rounded-full border shrink-0 ${statusBadge(lead.status)}`}>
                   {lead.status.toUpperCase()}
                 </span>
                 <div>
-                  <p className="font-semibold text-white">{lead.biz}</p>
-                  <p className="text-xs text-gray-400">{lead.contact} · Last: {lead.last}</p>
+                  <p className="font-semibold text-white">{lead.company ?? lead.name}</p>
+                  <p className="text-xs text-gray-400">{lead.phone ?? lead.email ?? "No contact"} · {new Date(lead.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 ml-auto">
-                <div className="text-right">
-                  <p className="font-bold text-[#FFD700]">{lead.value}</p>
-                  <p className="text-xs text-gray-500">Deal value</p>
-                </div>
+                {lead.estimatedValue && (
+                  <div className="text-right">
+                    <p className="font-bold text-[#FFD700]">${lead.estimatedValue.toLocaleString()}</p>
+                    <p className="text-xs text-gray-500">Est. value</p>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => { setActiveTab("comms"); setCallPhone(lead.contact); }}
+                    onClick={() => { setActiveTab("comms"); setCallPhone(lead.phone ?? ""); }}
                     className="bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-green-500/30 transition-colors"
                   >
                     📞 Call
                   </button>
                   <button
-                    onClick={() => { setActiveTab("comms"); setSmsPhone(lead.contact); }}
+                    onClick={() => { setActiveTab("comms"); setSmsPhone(lead.phone ?? ""); }}
                     className="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-500/30 transition-colors"
                   >
                     💬 SMS
                   </button>
                   <button
-                    onClick={() => { setActiveTab("payment"); setPayDesc(lead.biz + " – Sponsorship"); }}
+                    onClick={() => { setActiveTab("payment"); setPayDesc((lead.company ?? lead.name) + " – Sponsorship"); }}
                     className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-yellow-500/30 transition-colors"
                   >
                     💳 Pay
@@ -198,6 +213,9 @@ export default function SalesPage() {
               </div>
             </div>
           ))}
+          {!leadsLoading && leads.length === 0 && (
+            <p className="text-center text-slate-500 py-6 text-sm">No leads yet. <a href="/contact" className="text-[#00d4ff] hover:underline">Capture a lead →</a></p>
+          )}
           <button className="w-full py-3 border border-dashed border-slate-700 rounded-xl text-slate-500 hover:border-cyan-700 hover:text-cyan-400 transition-colors text-sm">
             + Add New Lead
           </button>

@@ -105,3 +105,124 @@ model PriceSnapshot {
 
   card      PlayerCard @relation(fields: [cardId], references: [id])
 }
+
+// ═══════════════════════════════════════════════════════════════
+// PHASE 2 — TROPTIONS SALES OPERATING SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+// ── Sponsors ─────────────────────────────────────────────────────
+model Sponsor {
+  id            String   @id @default(cuid())
+  name          String
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  package       String   @default("smart")     // smart | cultural | rewards
+  status        String   @default("prospect")  // prospect | active | paused | closed
+  budget        Float?
+  industry      String?
+  website       String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  campaigns     Campaign[]
+  leads         Lead[]
+}
+
+// ── Venues ───────────────────────────────────────────────────────
+model Venue {
+  id            String   @id @default(cuid())
+  name          String
+  address       String?
+  city          String   @default("Atlanta")
+  lat           Float?
+  lng           Float?
+  category      String   @default("general") // stadium | hotel | transit | entertainment | food | retail | general
+  capacity      Int?
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  status        String   @default("prospect") // prospect | onboarded | active | inactive
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  campaigns     Campaign[]
+  leads         Lead[]
+}
+
+// ── Campaigns ────────────────────────────────────────────────────
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  sponsorId   String?
+  venueId     String?
+  type        String   @default("qr")    // qr | offer | event | digital
+  status      String   @default("draft") // draft | active | paused | completed
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Float?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  redemptions Int      @default(0)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sponsor     Sponsor?  @relation(fields: [sponsorId], references: [id])
+  venue       Venue?    @relation(fields: [venueId],   references: [id])
+  qrCodes     QrCode[]
+}
+
+// ── QR Codes & Redemptions ───────────────────────────────────────
+model QrCode {
+  id          String   @id @default(cuid())
+  campaignId  String
+  code        String   @unique @default(cuid())
+  label       String?
+  offerText   String?
+  rewardValue Float?
+  rewardType  String   @default("discount") // discount | points | free_item | cashback
+  scans       Int      @default(0)
+  redemptions Int      @default(0)
+  active      Boolean  @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign  @relation(fields: [campaignId], references: [id])
+  events      QrEvent[]
+}
+
+model QrEvent {
+  id         String   @id @default(cuid())
+  qrCodeId   String
+  eventType  String   @default("scan") // scan | redeem | share
+  ipHash     String?  // SHA-256 hashed for privacy
+  userAgent  String?
+  location   String?
+  createdAt  DateTime @default(now())
+
+  qrCode     QrCode   @relation(fields: [qrCodeId], references: [id])
+}
+
+// ── Leads ────────────────────────────────────────────────────────
+model Lead {
+  id             String   @id @default(cuid())
+  type           String   @default("sponsor") // sponsor | venue | sales | general
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  message        String?
+  source         String   @default("web")  // web | qr | referral | cold
+  status         String   @default("new")  // new | contacted | qualified | converted | lost
+  estimatedValue Float?
+  sponsorId      String?
+  venueId        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sponsor        Sponsor? @relation(fields: [sponsorId], references: [id])
+  venue          Venue?   @relation(fields: [venueId],   references: [id])
+}

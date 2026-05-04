@@ -27,8 +27,11 @@ const NAV_LINKS = [
   { href: "/",              label: "Home" },
   { href: "/map",           label: "Live Ops",      accent: true },
   { href: "/sponsors",      label: "Partners",      accent: true },
+  { href: "/venues",        label: "Venues" },
+  { href: "/campaigns",     label: "Campaigns" },
+  { href: "/analytics",     label: "Analytics" },
   { href: "/sales",         label: "Sales Engine" },
-  { href: "/market",        label: "Market" },
+  { href: "/contact",       label: "Contact" },
   { href: "/dashboard",     label: "Dashboard",     cta: true },
 ];
 
