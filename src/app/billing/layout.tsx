@@ -1,5 +1,4 @@
-import DemoGate from "@/components/auth/DemoGate";
-
+// Gated by middleware.ts (server-side cookie check on /billing/*).
 export default function BillingLayout({ children }: { children: React.ReactNode }) {
-  return <DemoGate surface="Billing">{children}</DemoGate>;
+  return <>{children}</>;
 }

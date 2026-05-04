@@ -1,5 +1,4 @@
-import DemoGate from "@/components/auth/DemoGate";
-
+// Gated by middleware.ts (server-side cookie check on /admin/*).
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <DemoGate surface="Operator Admin">{children}</DemoGate>;
+  return <>{children}</>;
 }

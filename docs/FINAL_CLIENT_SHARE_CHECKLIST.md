@@ -87,10 +87,13 @@ For each `/register/<type>`:
 
 ## 11. Access controls
 
-- [ ] `NEXT_PUBLIC_DEMO_ACCESS_CODE` set on the deployed environment (do NOT use the dev fallback)
+- [ ] `DEMO_ACCESS_CODE` set on the deployed environment (server-side only — do NOT use `NEXT_PUBLIC_DEMO_ACCESS_CODE`, which leaks into the browser bundle)
+- [ ] Middleware redirect verified: visiting `/admin`, `/billing`, `/analytics`, `/settings/integrations`, `/launch` while not unlocked should land on `/demo-access`
+- [ ] Cookie `wwai_demo_access` is httpOnly, sameSite=lax, secure in production, max-age 8h
 - [ ] Demo code shared only via password manager or signed message
 - [ ] Demo URL not posted to public channels
-- [ ] After the demo, rotate the code
+- [ ] After every external presentation, rotate `DEMO_ACCESS_CODE`
+- [ ] Plan tracked to replace demo gate with real SSO before any live customer data
 
 ## 12. Sign-off
 

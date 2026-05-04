@@ -1,5 +1,4 @@
-import DemoGate from "@/components/auth/DemoGate";
-
+// Gated by middleware.ts (server-side cookie check on /settings/integrations/*).
 export default function IntegrationsLayout({ children }: { children: React.ReactNode }) {
-  return <DemoGate surface="Integrations">{children}</DemoGate>;
+  return <>{children}</>;
 }

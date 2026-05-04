@@ -1,5 +1,4 @@
-import DemoGate from "@/components/auth/DemoGate";
-
+// Gated by middleware.ts (server-side cookie check on /launch/*).
 export default function LaunchLayout({ children }: { children: React.ReactNode }) {
-  return <DemoGate surface="Launch">{children}</DemoGate>;
+  return <>{children}</>;
 }

@@ -22,6 +22,13 @@ Use this list to take a signed customer from demo to live. Anything not in this 
 - [ ] Wire SSO (Azure AD, Okta, Google Workspace) for `/admin`, `/analytics`, `/billing`, `/settings/integrations`.
 - [ ] Public pages stay anonymous.
 
+### Interim demo gate (pre-SSO)
+
+- [ ] `DEMO_ACCESS_CODE` set on the host (Vercel / Cloudflare / Azure). Server-only — never use `NEXT_PUBLIC_DEMO_ACCESS_CODE` for protected access.
+- [ ] Verify middleware redirect to `/demo-access` for `/admin`, `/billing`, `/analytics`, `/settings/integrations`, `/launch`.
+- [ ] Rotate `DEMO_ACCESS_CODE` after every external presentation.
+- [ ] Replace the demo gate (middleware + cookie) with real SSO before any live customer data flows through these surfaces.
+
 ## 4. Payments
 
 - [ ] Decide Square or Stripe. Set the relevant env keys (see `/settings/integrations`).
