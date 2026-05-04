@@ -64,7 +64,6 @@ export default function AiInfraPage() {
   }
 
   useEffect(() => {
-    fetchHealth();
     intervalRef.current = setInterval(fetchHealth, 30_000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, []);

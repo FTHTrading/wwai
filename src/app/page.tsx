@@ -230,7 +230,7 @@ export default function Home() {
                 </svg>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                {[["2,843","Transactions","text-green-400 text-[10px]"],["$45.21","Avg Order","text-green-400 text-[10px]"]].map(([v,l,c])=>(
+                {[["2,843","Transactions"],["$45.21","Avg Order"]].map(([v,l])=>(
                   <div key={l} className="bg-slate-900/60 rounded-lg p-1.5 text-center">
                     <p className="text-white text-xs font-bold">{v}</p>
                     <p className="text-slate-500 text-[9px]">{l}</p>

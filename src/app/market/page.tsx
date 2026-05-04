@@ -27,6 +27,7 @@ export default function MarketPage() {
       .then((d) => { setListings(Array.isArray(d) ? d : []); setLoading(false); });
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(load, []);
 
   async function confirmBuy(listing: Listing) {

@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get("address");
   if (!address) return NextResponse.json({ error: "address required" }, { status: 400 });
 
-  let user = await prisma.user.findUnique({ where: { address } });
+  const user = await prisma.user.findUnique({ where: { address } });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   // Optionally fetch live ATP balance

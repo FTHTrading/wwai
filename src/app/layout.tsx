@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -52,13 +53,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <nav className="nav-glass px-6 py-3 flex items-center justify-between sticky top-0 z-50">
 
           {/* Brand */}
-          <a href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group">
             <div className="troptions-hex-sm flex-shrink-0">T</div>
             <span className="brand-label">
               TROPTIONS<span className="brand-label-tm">™</span>
             </span>
             <span className="hidden md:inline-block text-[9px] text-slate-600 font-medium tracking-widest uppercase ml-1 mt-0.5 border border-slate-700 rounded px-1.5 py-0.5">AI · Blockchain · Sales</span>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-5 text-sm font-medium">

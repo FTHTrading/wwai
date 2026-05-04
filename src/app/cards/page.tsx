@@ -45,7 +45,7 @@ export default function CardsPage() {
       {loading && <p className="text-gray-400">Searching…</p>}
 
       {!loading && query && cards.length === 0 && (
-        <p className="text-gray-500">No cards found for "{query}". Make sure the database is seeded.</p>
+        <p className="text-gray-500">No cards found for &ldquo;{query}&rdquo;. Make sure the database is seeded.</p>
       )}
 
       {!loading && !query && (

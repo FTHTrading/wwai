@@ -59,6 +59,7 @@ export default function WriteOptionPage() {
     }
   }
 
+  // eslint-disable-next-line react-hooks/purity
   const minDate = new Date(Date.now() + 86400000).toISOString().slice(0, 16);
 
   return (

@@ -30,6 +30,7 @@ export default function OptionsPage() {
       .then((d) => { setContracts(Array.isArray(d) ? d : []); setLoading(false); });
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(load, []);
 
   async function exercise(contract: OptionContract) {
