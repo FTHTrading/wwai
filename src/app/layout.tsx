@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "TROPTIONS™ — AI + Blockchain + Sales Operating System",
-  description: "One System. One Brand. Unlimited Scale. Activate sponsors, drive fan engagement, and capture revenue with the TROPTIONS growth platform.",
+  title: "TROPTIONS™ — Growth Platform · Event OS",
+  description: "One System. One Brand. Unlimited Scale. Activate sponsors, drive fan engagement, and capture revenue with the TROPTIONS Growth Platform.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "TROPTIONS",
   },
   openGraph: {
-    title: "TROPTIONS™ — AI + Blockchain + Sales Operating System",
+    title: "TROPTIONS™ — Growth Platform · Event OS",
     description: "One System. One Brand. Unlimited Scale.",
     siteName: "TROPTIONS",
     type: "website",
@@ -24,29 +24,22 @@ export const metadata: Metadata = {
 };
 
 const NAV_LINKS = [
-  { href: "/",              label: "Home" },
-  { href: "/map",           label: "Live Ops",      accent: true },
-  { href: "/sponsors",      label: "Partners",      accent: true },
-  { href: "/venues",        label: "Venues" },
-  { href: "/campaigns",     label: "Campaigns" },
-  { href: "/pricing",       label: "Pricing" },
-  { href: "/demo",          label: "Demo" },
-  { href: "/case-studies",  label: "Case Studies" },
-  { href: "/proposals",     label: "Proposals" },
-  { href: "/billing",                label: "Billing" },
-  { href: "/analytics",              label: "Analytics" },
-  { href: "/sales",                  label: "Sales Engine" },
-  { href: "/settings/integrations",  label: "Integrations" },
-  { href: "/contact",                label: "Contact" },
-  { href: "/dashboard",              label: "Dashboard",     cta: true },
+  { href: "/market",    label: "Market" },
+  { href: "/options",   label: "Options" },
+  { href: "/cards",     label: "Cards" },
+  { href: "/map",       label: "Map",       accent: true },
+  { href: "/sponsors",  label: "Sponsors",  accent: true },
+  { href: "/sales",     label: "Sales" },
+  { href: "/wallet",    label: "Wallet" },
+  { href: "/dashboard", label: "Dashboard", cta: true },
 ];
 
 const MOBILE_NAV = [
-  { href: "/",          icon: "🏠", label: "Home" },
-  { href: "/map",       icon: "🗺",  label: "Live Ops" },
-  { href: "/pricing",   icon: "💲", label: "Pricing" },
-  { href: "/sales",     icon: "💼", label: "Sales" },
-  { href: "/dashboard", icon: "📊", label: "Dashboard" },
+  { href: "/",          label: "Home" },
+  { href: "/map",       label: "Map" },
+  { href: "/sales",     label: "Sales" },
+  { href: "/sponsors",  label: "Sponsors" },
+  { href: "/dashboard", label: "Dashboard" },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -67,7 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span className="brand-label">
               TROPTIONS<span className="brand-label-tm">™</span>
             </span>
-            <span className="hidden md:inline-block text-[9px] text-slate-600 font-medium tracking-widest uppercase ml-1 mt-0.5 border border-slate-700 rounded px-1.5 py-0.5">AI · Blockchain · Sales</span>
+            <span className="hidden md:inline-block text-[9px] text-slate-600 font-medium tracking-widest uppercase ml-1 mt-0.5 border border-slate-700 rounded px-1.5 py-0.5">Growth Platform</span>
           </Link>
 
           {/* Desktop links */}
@@ -87,9 +80,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </div>
 
           {/* Mobile quick links */}
-          <div className="md:hidden flex items-center gap-3">
-            <a href="/map"       className="text-cyan-400 text-lg">🗺</a>
-            <a href="/sales"     className="text-cyan-400 text-lg">💼</a>
+          <div className="md:hidden flex items-center gap-2">
+            <a href="/map"       className="text-cyan-400 text-xs font-semibold border border-[#00d4ff]/30 px-2.5 py-1.5 rounded-lg hover:bg-[#00d4ff]/5 transition-colors">Map</a>
+            <a href="/sales"     className="text-slate-400 text-xs font-semibold border border-[#162035] px-2.5 py-1.5 rounded-lg hover:text-white transition-colors">Sales</a>
             <a href="/dashboard" className="bg-[#00d4ff] text-[#050810] font-bold text-xs px-3 py-1.5 rounded-lg">Dashboard</a>
           </div>
         </nav>
@@ -101,7 +94,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {MOBILE_NAV.map((item) => (
             <a key={item.href} href={item.href}
                className="flex flex-col items-center gap-0.5 px-2 py-1 text-slate-500 transition-colors hover:text-cyan-400">
-              <span className="text-xl leading-none">{item.icon}</span>
               <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
             </a>
           ))}
@@ -111,7 +103,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <footer className="footer-bar hidden md:flex items-center justify-between px-8 py-4 text-xs">
           <div className="flex items-center gap-3">
             <span className="footer-brand">TROPTIONS<span style={{WebkitTextFillColor:"#94a3b8",fontSize:"0.7em",verticalAlign:"super"}}>™</span></span>
-            <span className="text-slate-600">AI + Blockchain + Sales Operating System</span>
+            <span className="text-slate-600">Event OS · Powered by Apostle Chain</span>
           </div>
           <div className="flex gap-4 text-slate-600">
             <span className="text-[#d4a017]/70">One System. One Brand. Unlimited Scale.</span>

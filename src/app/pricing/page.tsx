@@ -140,7 +140,7 @@ export default function PricingPage() {
 
                 {/* Reporting */}
                 <div className="mb-4 flex items-center gap-2 text-xs text-slate-400">
-                  <span className="text-[#00d4ff]">📊</span>
+                  <span className="text-[#00d4ff] font-bold text-xs border border-[#00d4ff]/20 bg-[#00d4ff]/5 px-1.5 py-0.5 rounded">RPT</span>
                   <span>{REPORTING[pkg.reportingLevel] ?? pkg.reportingLevel}</span>
                 </div>
 
@@ -195,15 +195,15 @@ export default function PricingPage() {
       {/* FAQ / Trust */}
       <section className="grid md:grid-cols-3 gap-4">
         {[
-          { icon: "🔒", title: "No Long-Term Lock-In",       body: "Month-to-month options available on all tiers. Annual plans include a 10% discount." },
-          { icon: "📊", title: "Real-Time Analytics",         body: "Every package includes access to campaign analytics. Enterprise includes a dedicated reporting portal." },
-          { icon: "🌐", title: "Multilingual by Default",     body: "All packages include English outreach. Higher tiers expand to Spanish, French, Arabic, and more." },
-          { icon: "⚡", title: "7-Day Activation",            body: "Standard campaigns go live within 7 business days of contract signing and asset delivery." },
-          { icon: "🤝", title: "Dedicated Support",           body: "City Activation and above include a dedicated account manager and priority support." },
-          { icon: "🧾", title: "Transparent Invoicing",       body: "All fees are itemized. Square and Stripe payment integrations available. Manual invoicing supported." },
+          { icon: "LK",  title: "No Long-Term Lock-In",   body: "Month-to-month options available on all tiers. Annual plans include a 10% discount." },
+          { icon: "AN",  title: "Real-Time Analytics",     body: "Every package includes access to campaign analytics. Enterprise includes a dedicated reporting portal." },
+          { icon: "ML",  title: "Multilingual by Default", body: "All packages include English outreach. Higher tiers expand to Spanish, French, Arabic, and more." },
+          { icon: "7D",  title: "7-Day Activation",        body: "Standard campaigns go live within 7 business days of contract signing and asset delivery." },
+          { icon: "SP",  title: "Dedicated Support",       body: "City Activation and above include a dedicated account manager and priority support." },
+          { icon: "IV",  title: "Transparent Invoicing",   body: "All fees are itemized. Square and Stripe payment integrations available. Manual invoicing supported." },
         ].map(f => (
           <div key={f.title} className="card-dark rounded-2xl p-5 space-y-2">
-            <span className="text-2xl">{f.icon}</span>
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#00d4ff]/10 border border-[#00d4ff]/20 text-[#00d4ff] text-xs font-black">{f.icon}</span>
             <h4 className="text-white font-semibold text-sm">{f.title}</h4>
             <p className="text-slate-400 text-xs leading-relaxed">{f.body}</p>
           </div>

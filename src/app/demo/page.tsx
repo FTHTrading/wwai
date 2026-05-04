@@ -118,7 +118,7 @@ export default function DemoPage() {
         <div className="relative z-10 space-y-3">
           <span className="pill-gold">Platform Demo</span>
           <h1 className="troptions-hero-brand">Platform Walkthrough</h1>
-          <p className="troptions-hero-subtitle">7 steps from sponsor conversation to paid invoice</p>
+          <p className="troptions-hero-subtitle">7 steps. From first conversation to paid invoice.</p>
           <p className="text-slate-400 text-sm max-w-2xl mx-auto">
             This is a live demo environment. All data shown is seeded for demonstration purposes.
             Every step links to a working page in the system.
@@ -131,6 +131,21 @@ export default function DemoPage() {
           </div>
         </div>
       </section>
+
+      {/* Progress strip */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {STEPS.map((s, i) => (
+          <div key={s.num} className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-full bg-[#00d4ff]/10 border border-[#00d4ff]/30 flex items-center justify-center">
+                <span className="text-[#00d4ff] text-[9px] font-black">{i + 1}</span>
+              </div>
+              <span className="text-slate-500 text-[10px] font-medium whitespace-nowrap">{s.title}</span>
+            </div>
+            {i < STEPS.length - 1 && <div className="w-6 h-px bg-[#162035] shrink-0" />}
+          </div>
+        ))}
+      </div>
 
       {/* Steps */}
       <section className="space-y-6">
@@ -147,7 +162,12 @@ export default function DemoPage() {
               <div className="flex-1 p-6 space-y-4 min-w-0">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-2 flex-1 min-w-0">
-                    <h2 className="text-white font-bold text-lg">{step.title}</h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-white font-bold text-lg">{step.title}</h2>
+                      <span className="text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border text-green-400 border-green-500/30 bg-green-500/10">
+                        Live
+                      </span>
+                    </div>
                     <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">

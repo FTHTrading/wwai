@@ -147,8 +147,8 @@ export default function CaseStudiesPage() {
               <h3 className="text-[#00d4ff] text-xs font-bold uppercase tracking-widest mb-4">Campaign Performance</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {c.results.map(r => (
-                  <div key={r.metric} className="bg-[#050810] rounded-xl p-4 border border-[#162035] space-y-1">
-                    <p className="text-white font-black text-xl">{r.value}</p>
+                  <div key={r.metric} className={`bg-[#050810] rounded-xl p-4 border space-y-1 ${c.tagColor === "pill-gold" ? "border-[#d4a017]/20" : "border-[#00d4ff]/20"}`}>
+                    <p className={`font-black text-xl ${c.tagColor === "pill-gold" ? "text-[#d4a017]" : "text-[#00d4ff]"}`}>{r.value}</p>
                     <p className="text-slate-300 text-xs font-semibold">{r.metric}</p>
                     <p className="text-slate-600 text-[10px]">{r.note}</p>
                   </div>

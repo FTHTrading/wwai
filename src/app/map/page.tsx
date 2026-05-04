@@ -64,6 +64,44 @@ export default function MapPage() {
   return (
     <div className="space-y-4">
 
+      {/* Operational Status Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Active Venues",       value: String(venues.length || 8),  color: "text-[#00d4ff]", live: true  },
+          { label: "Active Campaigns",    value: "12",                         color: "text-green-400", live: true  },
+          { label: "Live QR Zones",       value: "34",                         color: "text-[#00d4ff]", live: true  },
+          { label: "Sponsor Activations", value: "5",                          color: "text-[#d4a017]", live: false },
+        ].map(s => (
+          <div key={s.label} className="card-dark rounded-xl border border-[#162035] px-4 py-3 flex items-center justify-between gap-2">
+            <div>
+              <p className={`font-black text-lg ${s.color}`}>{s.value}</p>
+              <p className="text-slate-500 text-[10px] uppercase tracking-wider">{s.label}</p>
+            </div>
+            {s.live && <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />}
+          </div>
+        ))}
+      </div>
+
+      {/* Zone legend cards */}
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        {[
+          { label: "Sponsor Zones",     color: "#d4a017", desc: "Gold tier activation" },
+          { label: "Service Nodes",     color: "#00d4ff", desc: "QR + offers" },
+          { label: "Safety Corridors",  color: "#22c55e", desc: "Staffed safety posts" },
+          { label: "Transit Hubs",      color: "#facc15", desc: "MARTA + rideshare" },
+          { label: "Fan Flow",          color: "#22d3ee", desc: "Entry + gates" },
+          { label: "Ops Layer",         color: "#94a3b8", desc: "Future-ready" },
+        ].map(z => (
+          <div key={z.label} className="card-dark rounded-xl border border-[#162035] px-3 py-2.5 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: z.color }} />
+              <span className="text-white text-[11px] font-semibold">{z.label}</span>
+            </div>
+            <p className="text-slate-600 text-[9px]">{z.desc}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
       <div className="space-y-1">
         <span className="pill-gold">TROPTIONS Live Operations</span>

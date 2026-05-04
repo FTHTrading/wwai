@@ -237,7 +237,11 @@ export default function ProposalsPage() {
 
                   <div className="flex items-center gap-2 border border-[#162035] rounded-lg px-4 py-2.5">
                     <span className="text-[#d4a017] text-sm">↓</span>
-                    <p className="text-slate-500 text-xs">Save this proposal to prepare it for PDF export and sharing with the sponsor.</p>
+                    <p className="text-slate-500 text-xs">Save this proposal to prepare it for sharing with the sponsor.</p>
+                  </div>
+                  <div className="flex items-center gap-2 border border-[#162035] rounded-lg px-4 py-2.5 bg-[#050810]">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 border border-slate-700 bg-slate-800 px-1.5 py-0.5 rounded">Coming Soon</span>
+                    <p className="text-slate-600 text-xs">PDF Export — branded proposal export for sponsor delivery</p>
                   </div>
                 </div>
               </div>
@@ -264,7 +268,7 @@ export default function ProposalsPage() {
 
         {proposals.length === 0 && (
           <div className="card-dark rounded-2xl p-10 text-center space-y-3">
-            <div className="text-4xl">📋</div>
+            <div className="troptions-hex mx-auto">P</div>
             <p className="text-white font-semibold">No proposals yet</p>
             <p className="text-slate-400 text-sm">Create your first proposal to estimate contract value and package fit.</p>
             <button onClick={() => setCreating(true)} className="btn-troptions">+ New Proposal</button>
