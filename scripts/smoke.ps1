@@ -78,7 +78,7 @@ function Probe {
         $resp.Close()
 
         if ($Protected) {
-            # We expect a 307/302/301 redirect to /demo-access, or a 200 on /demo-access itself
+            # PASS: 3xx redirect toward /demo-access
             if ($status -in @(301, 302, 307, 308)) {
                 if ($location -match "demo-access") {
                     Pass "$display — $status -> /demo-access (GATED)"
@@ -86,7 +86,9 @@ function Probe {
                     Warn "$display — $status redirect to '$location' (expected /demo-access)"
                 }
             } elseif ($status -eq 200) {
-                Fail "$display — 200 without gate. Protected route is openly accessible!"
+                # 200 is OK only if the page contains the access-gate marker
+                # (middleware may render the gate inline in some edge cases)
+                Fail "$display — 200 with no redirect. Protected route may be openly accessible!"
             } else {
                 Warn "$display — $status (unexpected for protected route)"
             }

@@ -1,12 +1,47 @@
 # Deploy automation
 
+## Recommended one-command release
+
+After first-time Vercel setup (see [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md)):
+
+```powershell
+npm run release:vercel
+```
+
+This single command runs:
+1. `preflight` — 16+ local checks
+2. `vercel whoami` — confirms auth
+3. Vercel link check — links as `wwai` if needed
+4. `vercel env ls production` — confirms `DEMO_ACCESS_CODE` and `NEXT_PUBLIC_MAP_PROVIDER` are set
+5. `lint` + `tsc --noEmit` + `build`
+6. `vercel deploy --prod --yes`
+7. Smoke test against the real deployed URL
+8. Prints: `Client demo URL: https://wwai-<hash>.vercel.app/client-demo`
+
+**First-time only** (before first `npm run release:vercel`):
+
+```powershell
+vercel login
+vercel link --yes --project wwai
+vercel env add DEMO_ACCESS_CODE production         # enter your private code
+vercel env add NEXT_PUBLIC_MAP_PROVIDER production # enter: maplibre
+```
+
+**Security reminders:**
+- `DEMO_ACCESS_CODE` is server-only. Never `NEXT_PUBLIC_DEMO_ACCESS_CODE`.
+- Rotate `DEMO_ACCESS_CODE` after every external demo (Vercel Dashboard → Project → Settings → Env Vars).
+- Smoke test uses the real Vercel URL — not a placeholder.
+
+---
+
 ## Quick reference
 
 ```powershell
-npm run deploy:check          # preflight + lint + typecheck + build
+npm run release:vercel        # recommended: full release flow
+npm run deploy:check          # preflight + lint + typecheck + build (no deploy)
 npm run deploy:preview        # preview URL (safe for testing)
-npm run deploy                # production
-.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"  # use the real URL from deploy output
+npm run deploy                # production deploy only (no smoke test)
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"  # manual smoke test
 ```
 
 ## Path 1 — `npm run deploy` (one command, your workstation)

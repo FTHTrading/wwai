@@ -48,8 +48,18 @@ Without a `wwai_demo_access` cookie, each of these should redirect to `/demo-acc
 
 ## Deploy
 
+### Recommended (deploy + smoke in one command)
+
 ```powershell
-npm run deploy        # production
+npm run release:vercel
+```
+
+This deploys to production, runs smoke automatically, and prints the client share URL.
+
+### Manual alternative
+
+```powershell
+npm run deploy          # production
 # or
 npm run deploy:preview  # ephemeral preview URL for internal review first
 ```
@@ -58,9 +68,15 @@ npm run deploy:preview  # ephemeral preview URL for internal review first
 
 ### Smoke test
 
+If using `npm run release:vercel`, smoke runs automatically.
+
+For manual smoke after `npm run deploy`:
+
 ```powershell
-.\scripts\smoke.ps1 -BaseUrl "https://your-vercel-url.vercel.app"
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"
 ```
+
+> Copy the URL printed by Vercel deploy output. The script will error immediately on placeholder URLs.
 
 All public routes: `[PASS]`
 All protected routes: `[PASS] ... GATED`

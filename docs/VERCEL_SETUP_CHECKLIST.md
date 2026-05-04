@@ -43,13 +43,21 @@ Optional for future phases:
 
 ## 4. Deploy
 
-Click **Deploy**.
+Click **Deploy** in the Vercel dashboard for the initial import deploy, or from your workstation run:
+
+```powershell
+npm run release:vercel
+```
+
+This verifies env vars, builds, deploys, runs smoke tests, and prints the client share URL automatically.
 
 The first deploy takes ~60–90 seconds. You will get a URL like:
 
 ```
 https://wwai-<hash>.vercel.app
 ```
+
+See [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md) for complete env var setup instructions.
 
 ## 5. Verify
 

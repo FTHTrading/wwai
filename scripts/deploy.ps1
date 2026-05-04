@@ -101,8 +101,10 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Vercel deploy command failed." }
 
     Write-Host ""
-    Write-Host "[deploy] Done. Share this URL first: <vercel-url>/client-demo" -ForegroundColor Green
-    Write-Host "[deploy] Run smoke test: .\scripts\smoke.ps1 -BaseUrl '<your-url>'" -ForegroundColor Cyan
+    Write-Host "[deploy] Done." -ForegroundColor Green
+    Write-Host "[deploy] For a full release with smoke test, use: npm run release:vercel" -ForegroundColor Cyan
+    Write-Host "[deploy] To smoke test manually: .\scripts\smoke.ps1 -BaseUrl '<vercel-url>'" -ForegroundColor Cyan
+    Write-Host "[deploy] Share: <vercel-url>/client-demo" -ForegroundColor Green
 } finally {
     Pop-Location
 }
