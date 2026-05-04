@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WWAI / TROPTIONS Sales Operating System
 
-## Getting Started
+**WWAI** (Worldwide AI) is an AI-powered guest concierge for live events.
+**TROPTIONS** is a loyalty and payments network for event operators.
 
-First, run the development server:
+Together they form a single platform: sponsor activation, guest wayfinding, digital payments, operator dashboards, and sales proposals — all demo-ready and controlled.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Local setup
+
+```powershell
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and set:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+DEMO_ACCESS_CODE=troptions-demo        # dev only — change before sharing externally
+NEXT_PUBLIC_MAP_PROVIDER=maplibre      # free OSM tiles, no API key required
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> Never commit `.env.local`. Never use `NEXT_PUBLIC_DEMO_ACCESS_CODE` — it leaks to the browser.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Run dev server
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```powershell
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000/client-demo](http://localhost:3000/client-demo) — the safe demo entry point.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pre-deploy check
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```powershell
+npm run deploy:check
+```
+
+Runs preflight → lint → typecheck → build. All must pass before deploying.
+
+---
+
+## Deploy
+
+### Local one-command deploy (Vercel)
+
+First-time only:
+
+```powershell
+npm install --global vercel
+vercel login
+vercel link --yes
+vercel env add DEMO_ACCESS_CODE production
+vercel env add NEXT_PUBLIC_MAP_PROVIDER production    # value: maplibre
+```
+
+Every deploy after that:
+
+```powershell
+npm run deploy:preview    # ephemeral preview URL (start here)
+npm run deploy            # production
+```
+
+### Push-to-deploy (GitHub Actions)
+
+Add three secrets at https://github.com/FTHTrading/wwai/settings/secrets/actions:
+`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+
+Every push to `main` then deploys to production automatically.
+
+See [docs/DEPLOY_AUTOMATION.md](docs/DEPLOY_AUTOMATION.md) for full details.
+See [docs/VERCEL_SETUP_CHECKLIST.md](docs/VERCEL_SETUP_CHECKLIST.md) for first-time Vercel project setup.
+
+---
+
+## Post-deploy smoke test
+
+```powershell
+.\scripts\smoke.ps1 -BaseUrl "https://your-vercel-url.vercel.app"
+```
+
+Checks all public routes return 200 and all protected routes are gated.
+
+---
+
+## Required env vars
+
+| Name | Where | Notes |
+|---|---|---|
+| `DEMO_ACCESS_CODE` | Server only | Gates `/admin`, `/billing`, `/analytics`, `/settings/integrations`, `/launch` |
+| `NEXT_PUBLIC_MAP_PROVIDER` | Browser-safe | `maplibre` for free OSM tiles |
+
+---
+
+## Demo access
+
+- Protected routes require a `wwai_demo_access` cookie (set by `/demo-access` after submitting `DEMO_ACCESS_CODE`)
+- Always share `/client-demo` first — not `/admin` or `/billing`
+- Rotate `DEMO_ACCESS_CODE` in Vercel after every external presentation
+- This is **demo gating, not production auth** — replace with SSO before live customer data
+
+See [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) before every external share.
+

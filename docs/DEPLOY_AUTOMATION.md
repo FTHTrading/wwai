@@ -1,6 +1,13 @@
 # Deploy automation
 
-Two paths, both fully automated.
+## Quick reference
+
+```powershell
+npm run deploy:check          # preflight + lint + typecheck + build
+npm run deploy:preview        # preview URL (safe for testing)
+npm run deploy                # production
+.\scripts\smoke.ps1 -BaseUrl "https://your-url.vercel.app"
+```
 
 ## Path 1 — `npm run deploy` (one command, your workstation)
 
@@ -17,44 +24,68 @@ vercel env add NEXT_PUBLIC_MAP_PROVIDER production    # value: maplibre
 Every deploy after that:
 
 ```powershell
-npm run deploy            # production
-npm run deploy:preview    # ephemeral preview URL
+npm run deploy:check          # preflight + lint + typecheck + build
+npm run deploy:preview        # preview URL (safe starting point)
+npm run deploy                # production
 ```
 
-The script runs lint → typecheck → build → `vercel deploy`. Skip the local checks with `-SkipChecks` if needed:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 -SkipChecks
-```
+`scripts/deploy.ps1` runs preflight → lint → typecheck → build automatically. Skip with `-SkipChecks` only when you know why.
 
 ## Path 2 — GitHub Actions (auto-deploy on push to `main`)
 
 Workflow files:
 
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) — lint + typecheck + build on every PR and push
-- [.github/workflows/deploy-vercel.yml](.github/workflows/deploy-vercel.yml) — production deploy on push to `main`; manual `workflow_dispatch` allows preview/production choice
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) — lint + typecheck + build on every PR and push, with build summary
+- [.github/workflows/deploy-vercel.yml](.github/workflows/deploy-vercel.yml) — production deploy on push to `main`; skips gracefully when secrets absent; deploy URL in step summary
 
-Add three repository secrets at https://github.com/FTHTrading/wwai/settings/secrets/actions:
+### GitHub repository secrets — required for auto-deploy
+
+Go to: **https://github.com/FTHTrading/wwai/settings/secrets/actions → New repository secret**
 
 | Secret | Where to find it |
 |---|---|
-| `VERCEL_TOKEN` | https://vercel.com/account/tokens (create a "wwai-ci" token) |
-| `VERCEL_ORG_ID` | After `vercel link`, read from `.vercel/project.json` |
-| `VERCEL_PROJECT_ID` | After `vercel link`, read from `.vercel/project.json` |
+| `VERCEL_TOKEN` | https://vercel.com/account/tokens → create a "wwai-ci" token |
+| `VERCEL_ORG_ID` | `Get-Content .vercel/project.json` after `vercel link` |
+| `VERCEL_PROJECT_ID` | Same file |
 
-Print them locally:
+Once all three are set, every push to `main` ships to production automatically.
+
+### Vercel project environment variables — required
+
+Set in **Vercel dashboard → Project → Settings → Environment Variables**:
+
+| Name | Value | Scope | Notes |
+|---|---|---|---|
+| `DEMO_ACCESS_CODE` | your private demo code | Production | Server-only. **Never** use `NEXT_PUBLIC_DEMO_ACCESS_CODE` |
+| `NEXT_PUBLIC_MAP_PROVIDER` | `maplibre` | All | Free OSM tiles, no API key needed |
+
+> `NEXT_PUBLIC_*` values ship in the browser bundle and are visible in page source.
+> `DEMO_ACCESS_CODE` is server-only and never exposed to clients.
+
+### Optional env vars (future phases)
+
+| Name | Phase |
+|---|---|
+| `DATABASE_URL` | Phase 1 — Postgres persistence |
+| `NEXTAUTH_SECRET` + `NEXTAUTH_URL` | Phase 2 — real SSO |
+| `SQUARE_ACCESS_TOKEN` / `STRIPE_SECRET_KEY` | Phase 4 — payments |
+| CRM tokens (Zoho/HubSpot) | Phase 3 — CRM sync |
+
+## Preflight script (`scripts/preflight.ps1`)
+
+Checks Node, npm, project files, middleware, env docs, git state, npm scripts. Exits nonzero only for real local blockers. Warns for remote config that can't be verified locally.
 
 ```powershell
-Get-Content .vercel/project.json
+npm run preflight
 ```
 
-Once secrets are set, **every push to `main` ships to production**. Trigger a preview manually from the Actions tab → `deploy-vercel` → Run workflow → Preview.
+## Smoke test script (`scripts/smoke.ps1`)
 
-## Vercel project env vars (set once)
+Checks public routes return 200 and protected routes redirect to `/demo-access`.
 
-| Name | Value | Scope |
-|---|---|---|
-| `DEMO_ACCESS_CODE` | your private code | Production (and Preview if you want gated previews) |
-| `NEXT_PUBLIC_MAP_PROVIDER` | `maplibre` | All |
+```powershell
+.\scripts\smoke.ps1 -BaseUrl "https://your-url.vercel.app"
+```
 
-That's it. CI guards every change, the action ships every merge, the script ships from your workstation when needed.
+See [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for the full release flow.
+See [VERCEL_SETUP_CHECKLIST.md](VERCEL_SETUP_CHECKLIST.md) for first-time Vercel project setup.

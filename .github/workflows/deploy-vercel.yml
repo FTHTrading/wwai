@@ -1,5 +1,16 @@
 name: deploy-vercel
 
+# Requires three repository secrets:
+#   VERCEL_TOKEN      — from https://vercel.com/account/tokens
+#   VERCEL_ORG_ID     — from .vercel/project.json after `vercel link`
+#   VERCEL_PROJECT_ID — from .vercel/project.json after `vercel link`
+#
+# Vercel project env vars (set in Vercel dashboard, NOT here):
+#   DEMO_ACCESS_CODE          — your private demo code (server-only)
+#   NEXT_PUBLIC_MAP_PROVIDER  — maplibre
+#
+# NEVER set NEXT_PUBLIC_DEMO_ACCESS_CODE — it leaks into the browser bundle.
+
 on:
   push:
     branches: [main]
@@ -21,10 +32,8 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Only run when Vercel secrets are configured. Set them in:
-    # GitHub repo -> Settings -> Secrets and variables -> Actions:
-    #   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
-    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    # Skips silently when Vercel secrets are not yet configured.
+    if: ${{ secrets.VERCEL_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +41,9 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+
+      - name: Install
+        run: npm ci
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -54,4 +66,20 @@ jobs:
         run: vercel build ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy
-        run: vercel deploy --prebuilt ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $URL"
+
+      - name: Deploy summary
+        if: always()
+        run: |
+          echo "## Deploy Result" >> $GITHUB_STEP_SUMMARY
+          echo "- Target: ${{ steps.target.outputs.env }}" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next step" >> $GITHUB_STEP_SUMMARY
+          echo "Share: ${{ steps.deploy.outputs.url }}/client-demo" >> $GITHUB_STEP_SUMMARY
+          echo "Smoke: \`\`.\\scripts\\smoke.ps1 -BaseUrl \"${{ steps.deploy.outputs.url }}\"\`\`" >> $GITHUB_STEP_SUMMARY
