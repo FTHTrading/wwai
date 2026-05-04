@@ -53,10 +53,12 @@ First-time only:
 ```powershell
 npm install --global vercel
 vercel login
-vercel link --yes
+vercel link --yes --project wwai    # IMPORTANT: pass --project wwai explicitly
 vercel env add DEMO_ACCESS_CODE production
 vercel env add NEXT_PUBLIC_MAP_PROVIDER production    # value: maplibre
 ```
+
+> **Why `--project wwai`?** The local folder `fifa troptions` would otherwise produce an invalid Vercel project slug. Always pass the project name explicitly.
 
 Every deploy after that:
 
@@ -80,10 +82,10 @@ See [docs/VERCEL_SETUP_CHECKLIST.md](docs/VERCEL_SETUP_CHECKLIST.md) for first-t
 ## Post-deploy smoke test
 
 ```powershell
-.\scripts\smoke.ps1 -BaseUrl "https://your-vercel-url.vercel.app"
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"
 ```
 
-Checks all public routes return 200 and all protected routes are gated.
+Replace `<real-hash>` with the URL printed by `npm run deploy`. The script exits immediately if a placeholder URL is detected.
 
 ---
 

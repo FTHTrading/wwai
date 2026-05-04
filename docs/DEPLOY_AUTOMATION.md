@@ -6,7 +6,7 @@
 npm run deploy:check          # preflight + lint + typecheck + build
 npm run deploy:preview        # preview URL (safe for testing)
 npm run deploy                # production
-.\scripts\smoke.ps1 -BaseUrl "https://your-url.vercel.app"
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"  # use the real URL from deploy output
 ```
 
 ## Path 1 — `npm run deploy` (one command, your workstation)
@@ -16,10 +16,12 @@ Pre-reqs (one-time):
 ```powershell
 npm install --global vercel
 vercel login
-vercel link --yes
+vercel link --yes --project wwai                      # IMPORTANT: always pass --project wwai
 vercel env add DEMO_ACCESS_CODE production            # paste your private code
 vercel env add NEXT_PUBLIC_MAP_PROVIDER production    # value: maplibre
 ```
+
+> **Why `--project wwai`?** The local folder is named `fifa troptions`. If Vercel auto-derives a project name from that path it produces an invalid slug. Always pass `--project wwai` explicitly.
 
 Every deploy after that:
 
@@ -84,8 +86,52 @@ npm run preflight
 Checks public routes return 200 and protected routes redirect to `/demo-access`.
 
 ```powershell
-.\scripts\smoke.ps1 -BaseUrl "https://your-url.vercel.app"
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<real-hash>.vercel.app"
 ```
 
-See [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for the full release flow.
+> **Use the real URL.** Running smoke against `https://your-url.vercel.app` (the placeholder) will exit immediately with an error. Copy the actual URL from the Vercel deploy output.
 See [VERCEL_SETUP_CHECKLIST.md](VERCEL_SETUP_CHECKLIST.md) for first-time Vercel project setup.
+
+---
+
+## Troubleshooting
+
+### Vercel link fails — invalid project name
+
+**Symptom:**
+```
+Project names can be up to 100 characters long and must be lowercase…
+cannot contain the sequence '---'
+```
+
+**Cause:** Vercel auto-detected the local folder name (`fifa troptions`), which contains spaces or produces an invalid slug.
+
+**Fix:**
+```powershell
+vercel login
+vercel link --yes --project wwai
+```
+
+If deploying under a Vercel team/account:
+```powershell
+$env:VERCEL_SCOPE = "your-team-or-account"
+vercel link --yes --project wwai --scope $env:VERCEL_SCOPE
+```
+
+Then:
+```powershell
+npm run deploy
+```
+
+`scripts/deploy.ps1` always passes `--project wwai` (or `$env:VERCEL_PROJECT_NAME` if set) so you should not hit this again after the first link.
+
+### Smoke test reports 404 / unreachable for every route
+
+**Cause:** You ran smoke against the placeholder URL `https://your-url.vercel.app`.
+
+**Fix:** Use the real Vercel URL printed after `npm run deploy`:
+```powershell
+.\scripts\smoke.ps1 -BaseUrl "https://wwai-<your-hash>.vercel.app"
+```
+
+The smoke script will now exit immediately with an error if a placeholder URL is detected.

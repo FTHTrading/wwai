@@ -21,6 +21,28 @@ $fail = 0
 
 $BaseUrl = $BaseUrl.TrimEnd("/")
 
+# ── Guard: refuse placeholder URLs ────────────────────────────────────────────
+$placeholderPatterns = @(
+    "your-url\.vercel\.app",
+    "your-vercel-url",
+    "<your-vercel-url>",
+    "example\.com",
+    "REAL-VERCEL-URL",
+    "wwai-your-real-deploy"
+)
+foreach ($pattern in $placeholderPatterns) {
+    if ($BaseUrl -match $pattern) {
+        Write-Host ""
+        Write-Host "ERROR: Placeholder URL detected." -ForegroundColor Red
+        Write-Host "  '$BaseUrl' is not a real deployment." -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Deploy first, then run smoke against the real Vercel URL:" -ForegroundColor Yellow
+        Write-Host "  npm run deploy" -ForegroundColor Yellow
+        Write-Host "  .\scripts\smoke.ps1 -BaseUrl `"https://wwai-<hash>.vercel.app`"" -ForegroundColor Yellow
+        exit 1
+    }
+}
+
 function Pass($msg) {
     Write-Host "  [PASS] $msg" -ForegroundColor Green
     $script:pass++

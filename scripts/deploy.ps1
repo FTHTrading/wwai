@@ -58,9 +58,35 @@ try {
 
     # ── Link check ───────────────────────────────────────────────────────────
     if (-not (Test-Path ".vercel/project.json")) {
-        Write-Host "[deploy] No .vercel/project.json found. Running 'vercel link'..." -ForegroundColor Yellow
-        vercel link --yes
-        if ($LASTEXITCODE -ne 0) { throw "Vercel link failed. Run 'vercel login' first." }
+        # Resolve project name: env override → default "wwai"
+        $ProjectName = $env:VERCEL_PROJECT_NAME
+        if ([string]::IsNullOrWhiteSpace($ProjectName)) {
+            $ProjectName = "wwai"
+        }
+
+        Write-Host "[deploy] No .vercel/project.json found." -ForegroundColor Yellow
+        Write-Host "[deploy] Linking Vercel project as: $ProjectName" -ForegroundColor Yellow
+        Write-Host "[deploy] If this fails, run: vercel login" -ForegroundColor Yellow
+
+        $linkArgs = @("link", "--yes", "--project", $ProjectName)
+        if (-not [string]::IsNullOrWhiteSpace($env:VERCEL_SCOPE)) {
+            $linkArgs += @("--scope", $env:VERCEL_SCOPE)
+            Write-Host "[deploy] Using scope: $($env:VERCEL_SCOPE)" -ForegroundColor Yellow
+        }
+
+        & vercel @linkArgs
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host ""
+            Write-Host "Vercel link failed." -ForegroundColor Red
+            Write-Host "Run:" -ForegroundColor Red
+            Write-Host "  vercel login" -ForegroundColor Red
+            Write-Host "  vercel link --yes --project wwai" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "If deploying under a team, run:" -ForegroundColor Yellow
+            Write-Host "  `$env:VERCEL_SCOPE=`"your-team-or-account`"" -ForegroundColor Yellow
+            Write-Host "  vercel link --yes --project wwai --scope `$env:VERCEL_SCOPE" -ForegroundColor Yellow
+            throw "Vercel link failed."
+        }
     }
 
     # ── Deploy ───────────────────────────────────────────────────────────────

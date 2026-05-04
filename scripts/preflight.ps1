@@ -100,6 +100,32 @@ if (Test-Path ".env.local") {
     }
 }
 
+# ── Vercel link ───────────────────────────────────────────────────────────────
+Write-Host ""
+Write-Host "── Vercel" -ForegroundColor Cyan
+
+if (Test-Path ".vercel/project.json") {
+    Pass "Vercel project linked (.vercel/project.json exists)"
+} else {
+    Warn "Vercel project not linked yet (.vercel/project.json missing)"
+    Warn "deploy.ps1 will auto-link using VERCEL_PROJECT_NAME or default 'wwai'"
+    Warn "To link manually: vercel login && vercel link --yes --project wwai"
+}
+
+# Validate VERCEL_PROJECT_NAME if set
+if (-not [string]::IsNullOrWhiteSpace($env:VERCEL_PROJECT_NAME)) {
+    $vProjName = $env:VERCEL_PROJECT_NAME
+    if ($vProjName -match '\s') {
+        Warn "VERCEL_PROJECT_NAME contains spaces ('$vProjName'). Vercel project names cannot have spaces."
+    } elseif ($vProjName -cmatch '[A-Z]') {
+        Warn "VERCEL_PROJECT_NAME contains uppercase ('$vProjName'). Vercel requires lowercase."
+    } elseif ($vProjName -match '---') {
+        Warn "VERCEL_PROJECT_NAME contains '---' ('$vProjName'). Vercel does not allow that sequence."
+    } else {
+        Pass "VERCEL_PROJECT_NAME='$vProjName' looks valid"
+    }
+}
+
 # ── Git state ─────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "── Git state" -ForegroundColor Cyan

@@ -10,8 +10,11 @@ Run this once when setting up the Vercel project for the first time.
 
 ## 2. Configure the project
 
+> **Project name:** Set this to **`wwai`** (manually, in the "Project Name" field). Do **not** let Vercel auto-derive a name from the local folder (`fifa troptions`) — it will produce an invalid slug with `---`.
+
 | Setting | Value |
 |---|---|
+| **Project name** | `wwai` |
 | Framework preset | Next.js (auto-detected) |
 | Root directory | `.` (default) |
 | Build command | `npm run build` (default) |
