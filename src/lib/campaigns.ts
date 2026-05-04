@@ -57,14 +57,19 @@ export async function listCampaigns(status?: string): Promise<CampaignRow[]> {
   });
 }
 
-export async function getCampaign(id: string): Promise<CampaignRow | null> {
+export async function getCampaign(id: string) {
   return prisma.campaign.findUnique({
     where: { id },
     include: {
-      sponsor:  { select: { name: true } },
-      venue:    { select: { name: true } },
+      sponsor:  { select: { id: true, name: true, industry: true } },
+      venue:    { select: { id: true, name: true, city: true, category: true } },
       _count:   { select: { qrCodes: true } },
-      qrCodes:  { orderBy: { createdAt: "asc" } },
+      qrCodes:  {
+        orderBy: { createdAt: "asc" },
+        include: {
+          events: { select: { id: true, eventType: true, createdAt: true }, take: 20, orderBy: { createdAt: "desc" } },
+        },
+      },
     },
   });
 }

@@ -29,6 +29,9 @@ const NAV_LINKS = [
   { href: "/sponsors",      label: "Partners",      accent: true },
   { href: "/venues",        label: "Venues" },
   { href: "/campaigns",     label: "Campaigns" },
+  { href: "/pricing",       label: "Pricing" },
+  { href: "/proposals",     label: "Proposals" },
+  { href: "/billing",       label: "Billing" },
   { href: "/analytics",     label: "Analytics" },
   { href: "/sales",         label: "Sales Engine" },
   { href: "/contact",       label: "Contact" },
@@ -38,7 +41,7 @@ const NAV_LINKS = [
 const MOBILE_NAV = [
   { href: "/",          icon: "🏠", label: "Home" },
   { href: "/map",       icon: "🗺",  label: "Live Ops" },
-  { href: "/sponsors",  icon: "🤝", label: "Partners" },
+  { href: "/pricing",   icon: "💲", label: "Pricing" },
   { href: "/sales",     icon: "💼", label: "Sales" },
   { href: "/dashboard", icon: "📊", label: "Dashboard" },
 ];

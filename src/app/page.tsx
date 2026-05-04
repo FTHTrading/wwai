@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import BrandDisclaimer from "@/components/BrandDisclaimer";
 
 const MODULES = [
@@ -76,13 +77,13 @@ export default function Home() {
 
           {/* CTA row */}
           <div className="flex flex-wrap justify-center gap-4 pt-3">
-            <a href="/sponsors" className="btn-troptions">
+            <Link href="/sponsors" className="btn-troptions">
               <span className="troptions-hex-sm text-sm">T</span>
               Grow with TROPTIONS →
-            </a>
-            <a href="/dashboard" className="border border-slate-700 text-slate-300 font-bold px-7 py-3 rounded-xl hover:bg-slate-800/60 transition-colors">
+            </Link>
+            <Link href="/dashboard" className="border border-slate-700 text-slate-300 font-bold px-7 py-3 rounded-xl hover:bg-slate-800/60 transition-colors">
               📊 Dashboard
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -338,10 +339,10 @@ export default function Home() {
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[150px] bg-[#d4a017]/5 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 space-y-4">
-          <a href="/sponsors" className="btn-troptions inline-flex">
+          <Link href="/sponsors" className="btn-troptions inline-flex">
             <span className="troptions-hex text-base">T</span>
             Grow with TROPTIONS →
-          </a>
+          </Link>
           <p className="text-[#d4a017]/60 font-semibold text-sm tracking-widest uppercase">One System. One Brand. Unlimited Scale.</p>
           <BrandDisclaimer />
         </div>

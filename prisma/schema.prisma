@@ -128,6 +128,8 @@ model Sponsor {
 
   campaigns     Campaign[]
   leads         Lead[]
+  proposals     Proposal[]
+  invoices      Invoice[]
 }
 
 // ── Venues ───────────────────────────────────────────────────────
@@ -150,6 +152,7 @@ model Venue {
 
   campaigns     Campaign[]
   leads         Lead[]
+  proposals     Proposal[]
 }
 
 // ── Campaigns ────────────────────────────────────────────────────
@@ -204,6 +207,69 @@ model QrEvent {
   createdAt  DateTime @default(now())
 
   qrCode     QrCode   @relation(fields: [qrCodeId], references: [id])
+}
+
+// ── Sponsor Packages ─────────────────────────────────────────────
+model SponsorPackage {
+  id              String   @id @default(cuid())
+  slug            String   @unique           // local-venue | category | city-activation | premium | enterprise
+  name            String
+  tagline         String?
+  monthlyFee      Float
+  setupFee        Float    @default(0)
+  campaignLimit   Int      @default(1)
+  qrLimit         Int      @default(5)
+  venuePlacementLimit Int  @default(1)
+  reportingLevel  String   @default("basic") // basic | standard | advanced | enterprise
+  includedServices String? // JSON-serialized array stored as string
+  featured        Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  proposals       Proposal[]
+}
+
+// ── Proposals ────────────────────────────────────────────────────
+model Proposal {
+  id              String   @id @default(cuid())
+  sponsorId       String?
+  packageId       String?
+  venueId         String?
+  campaignType    String   @default("qr")
+  termMonths      Int      @default(12)
+  customBudget    Float?
+  estimatedROI    Float?
+  notes           String?
+  status          String   @default("draft") // draft | sent | accepted | declined
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sponsor         Sponsor?        @relation(fields: [sponsorId], references: [id])
+  package         SponsorPackage? @relation(fields: [packageId], references: [id])
+  venue           Venue?          @relation(fields: [venueId],   references: [id])
+  invoices        Invoice[]
+}
+
+// ── Invoices ──────────────────────────────────────────────────────
+model Invoice {
+  id              String   @id @default(cuid())
+  sponsorId       String?
+  proposalId      String?
+  invoiceNumber   String   @unique
+  amount          Float
+  currency        String   @default("USD")
+  description     String?
+  status          String   @default("draft") // draft | sent | paid | overdue | void
+  dueDate         DateTime?
+  paidAt          DateTime?
+  paymentProvider String?  // square | stripe | manual
+  paymentRef      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sponsor         Sponsor?  @relation(fields: [sponsorId], references: [id])
+  proposal        Proposal? @relation(fields: [proposalId], references: [id])
 }
 
 // ── Leads ────────────────────────────────────────────────────────

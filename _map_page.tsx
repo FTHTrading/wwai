@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 
 const FLOORS = [
   { id: "L1",  label: "L1 Concourse" },
@@ -302,9 +303,9 @@ export default function MapPage() {
         <h2 className="text-2xl font-extrabold text-white">Navigate with TROPTIONS →</h2>
         <p className="text-gray-400 text-sm">One System. One Brand. Unlimited Scale.</p>
         <div className="flex justify-center gap-3 pt-2">
-          <a href="/sponsors" className="bg-yellow-400 text-gray-950 font-bold px-5 py-2.5 rounded-lg hover:bg-yellow-300 transition-colors text-sm">
+          <Link href="/sponsors" className="bg-yellow-400 text-gray-950 font-bold px-5 py-2.5 rounded-lg hover:bg-yellow-300 transition-colors text-sm">
             View Sponsors
-          </a>
+          </Link>
           <a href="/sales" className="border border-cyan-500 text-cyan-400 font-bold px-5 py-2.5 rounded-lg hover:bg-cyan-500/10 transition-colors text-sm">
             Sales Portal
           </a>

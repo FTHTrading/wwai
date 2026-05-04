@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Tab = "leads" | "team" | "comms" | "payment";
 
@@ -125,13 +126,13 @@ export default function SalesPage() {
               Turn deals into payouts with control, speed, and trust.
             </p>
           </div>
-          <a
+          <Link
             href="/sponsors"
             className="btn-troptions shrink-0 text-sm"
           >
             <span className="troptions-hex-sm">T</span>
             Partner Packages
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -212,6 +212,255 @@ async function main() {
   console.log("   QR Codes:", qrData.length);
   console.log("   QR Events:", 60);
   console.log("   Leads:", leadData.length);
+
+  // ── Phase 4: Sponsor Packages ──────────────────────────────
+  console.log("\nSeeding sponsor packages…");
+  const packageData = [
+    {
+      slug: "local-venue",
+      name: "Local Venue Sponsor",
+      tagline: "Perfect for neighborhood anchors and single-venue businesses.",
+      monthlyFee: 2500,
+      setupFee: 500,
+      campaignLimit: 1,
+      qrLimit: 3,
+      venuePlacementLimit: 1,
+      reportingLevel: "basic",
+      includedServices: JSON.stringify(["1 venue placement", "3 QR activations", "Monthly report", "English SMS outreach"]),
+      featured: false,
+      sortOrder: 1,
+    },
+    {
+      slug: "category-sponsor",
+      name: "Category Sponsor",
+      tagline: "Own a category across multiple venues in your city.",
+      monthlyFee: 7500,
+      setupFee: 1500,
+      campaignLimit: 3,
+      qrLimit: 10,
+      venuePlacementLimit: 3,
+      reportingLevel: "standard",
+      includedServices: JSON.stringify(["3 venue placements", "10 QR activations", "Category exclusivity", "Bi-weekly report", "2-language SMS outreach", "Campaign analytics dashboard"]),
+      featured: false,
+      sortOrder: 2,
+    },
+    {
+      slug: "city-activation",
+      name: "City Activation Sponsor",
+      tagline: "Full-city presence with integrated QR + digital campaigns.",
+      monthlyFee: 18000,
+      setupFee: 3500,
+      campaignLimit: 6,
+      qrLimit: 30,
+      venuePlacementLimit: 8,
+      reportingLevel: "advanced",
+      includedServices: JSON.stringify(["8 venue placements", "30 QR activations", "City exclusivity option", "Weekly performance report", "4-language outreach", "Live dashboard access", "Dedicated account manager", "Fan engagement analytics"]),
+      featured: true,
+      sortOrder: 3,
+    },
+    {
+      slug: "premium-world-cup",
+      name: "Premium World Cup Campaign",
+      tagline: "Flagship sponsorship built for World Cup activation and global reach.",
+      monthlyFee: 45000,
+      setupFee: 10000,
+      campaignLimit: 12,
+      qrLimit: 100,
+      venuePlacementLimit: 20,
+      reportingLevel: "enterprise",
+      includedServices: JSON.stringify(["20 venue placements", "100 QR activations", "World Cup co-branding", "Real-time analytics", "8-language outreach", "Stadium digital integration", "Media mention coordination", "VIP hospitality placement", "Priority support 24/7"]),
+      featured: true,
+      sortOrder: 4,
+    },
+    {
+      slug: "enterprise-brand-partner",
+      name: "Enterprise Brand Partner",
+      tagline: "Full-stack brand integration across the entire TROPTIONS platform.",
+      monthlyFee: 120000,
+      setupFee: 25000,
+      campaignLimit: 0,  // unlimited
+      qrLimit: 0,        // unlimited
+      venuePlacementLimit: 0, // unlimited
+      reportingLevel: "enterprise",
+      includedServices: JSON.stringify(["Unlimited venue placements", "Unlimited QR activations", "Platform co-branding rights", "White-label reporting portal", "All languages supported", "Custom campaign development", "Executive strategy sessions", "Revenue share model available", "Dedicated engineering support"]),
+      featured: true,
+      sortOrder: 5,
+    },
+  ];
+
+  for (const pkg of packageData) {
+    await prisma.sponsorPackage.upsert({
+      where: { slug: pkg.slug },
+      create: pkg,
+      update: { monthlyFee: pkg.monthlyFee, tagline: pkg.tagline },
+    });
+    const unlim = pkg.campaignLimit === 0 ? "unlimited" : `${pkg.campaignLimit} campaigns`;
+    console.log(`  ✓ ${pkg.name} ($${pkg.monthlyFee.toLocaleString()}/mo) — ${unlim}`);
+  }
+
+  // ── Phase 4: Proposals ─────────────────────────────────────
+  console.log("\nSeeding proposals…");
+  const pkgMap: Record<string, string> = {};
+  for (const pkg of packageData) {
+    const p = await prisma.sponsorPackage.findUnique({ where: { slug: pkg.slug } });
+    if (p) pkgMap[pkg.slug] = p.id;
+  }
+  const sponsorMap: Record<string, string> = {};
+  for (const s of sponsorData) {
+    const found = await prisma.sponsor.findFirst({ where: { name: s.name } });
+    if (found) sponsorMap[s.name] = found.id;
+  }
+
+  const proposalData = [
+    {
+      sponsorName: "CocaCola Beverages",
+      packageSlug: "city-activation",
+      campaignType: "qr",
+      termMonths: 12,
+      customBudget: 216000,
+      estimatedROI: 3.4,
+      notes: "Renewal proposal for Q3. Stadium + airport activations.",
+      status: "accepted",
+    },
+    {
+      sponsorName: "Delta Air Lines",
+      packageSlug: "premium-world-cup",
+      campaignType: "event",
+      termMonths: 24,
+      customBudget: 1080000,
+      estimatedROI: 5.2,
+      notes: "Multi-year World Cup partnership. Terminal + lounge QR activations.",
+      status: "accepted",
+    },
+    {
+      sponsorName: "Nike Atlanta",
+      packageSlug: "category-activation" as never,
+      campaignType: "digital",
+      termMonths: 6,
+      customBudget: 45000,
+      estimatedROI: 2.8,
+      notes: "Initial outreach proposal. Category: Athletic Apparel.",
+      status: "sent",
+    },
+    {
+      sponsorName: "Marriott Bonvoy",
+      packageSlug: "category-sponsor",
+      campaignType: "qr",
+      termMonths: 12,
+      customBudget: 90000,
+      estimatedROI: 2.1,
+      notes: "Hotel loyalty + points integration campaign.",
+      status: "draft",
+    },
+  ];
+
+  for (const prop of proposalData) {
+    const sId = sponsorMap[prop.sponsorName];
+    // use city-activation for Nike since "category-activation" is a typo in demo data
+    const pSlug = prop.packageSlug === ("category-activation" as never) ? "category-sponsor" : prop.packageSlug;
+    const pId = pkgMap[pSlug as string];
+    if (!sId) continue;
+    const existing = await prisma.proposal.findFirst({ where: { sponsorId: sId, status: prop.status } });
+    if (!existing) {
+      await prisma.proposal.create({
+        data: {
+          sponsorId: sId,
+          packageId: pId ?? null,
+          campaignType: prop.campaignType,
+          termMonths: prop.termMonths,
+          customBudget: prop.customBudget,
+          estimatedROI: prop.estimatedROI,
+          notes: prop.notes,
+          status: prop.status,
+        },
+      });
+    }
+    console.log(`  ✓ ${prop.sponsorName} — ${pSlug} (${prop.status})`);
+  }
+
+  // ── Phase 4: Invoices ──────────────────────────────────────
+  console.log("\nSeeding invoices…");
+  const invoiceData = [
+    {
+      sponsorName: "CocaCola Beverages",
+      invoiceNumber: "INV-2026-001",
+      amount: 21600,
+      description: "City Activation Sponsor — Month 1 of 12",
+      status: "paid",
+      dueDate: new Date("2026-02-01"),
+      paidAt: new Date("2026-01-28"),
+    },
+    {
+      sponsorName: "CocaCola Beverages",
+      invoiceNumber: "INV-2026-002",
+      amount: 21600,
+      description: "City Activation Sponsor — Month 2 of 12",
+      status: "paid",
+      dueDate: new Date("2026-03-01"),
+      paidAt: new Date("2026-02-27"),
+    },
+    {
+      sponsorName: "Delta Air Lines",
+      invoiceNumber: "INV-2026-003",
+      amount: 55000,
+      description: "Premium World Cup Campaign — Month 1 of 24 + Setup Fee",
+      status: "paid",
+      dueDate: new Date("2026-02-01"),
+      paidAt: new Date("2026-01-30"),
+    },
+    {
+      sponsorName: "Delta Air Lines",
+      invoiceNumber: "INV-2026-004",
+      amount: 45000,
+      description: "Premium World Cup Campaign — Month 2 of 24",
+      status: "paid",
+      dueDate: new Date("2026-03-01"),
+      paidAt: new Date("2026-02-26"),
+    },
+    {
+      sponsorName: "Truist Bank",
+      invoiceNumber: "INV-2026-005",
+      amount: 7500,
+      description: "Category Sponsor — Month 1 of 6",
+      status: "paid",
+      dueDate: new Date("2026-02-15"),
+      paidAt: new Date("2026-02-14"),
+    },
+    {
+      sponsorName: "Marriott Bonvoy",
+      invoiceNumber: "INV-2026-006",
+      amount: 9000,
+      description: "Category Sponsor — Month 1 of 12 + Setup Fee",
+      status: "sent",
+      dueDate: new Date("2026-05-15"),
+      paidAt: null,
+    },
+  ];
+
+  for (const inv of invoiceData) {
+    const sId = sponsorMap[inv.sponsorName];
+    const existing = await prisma.invoice.findFirst({ where: { invoiceNumber: inv.invoiceNumber } });
+    if (!existing) {
+      await prisma.invoice.create({
+        data: {
+          sponsorId: sId ?? null,
+          invoiceNumber: inv.invoiceNumber,
+          amount: inv.amount,
+          currency: "USD",
+          description: inv.description,
+          status: inv.status,
+          dueDate: inv.dueDate,
+          paidAt: inv.paidAt ?? null,
+        },
+      });
+    }
+    console.log(`  ✓ ${inv.invoiceNumber} — ${inv.sponsorName} ($${inv.amount.toLocaleString()}) [${inv.status}]`);
+  }
+
+  console.log("\n✅ Phase 4 seed complete.");
+  console.log("   Sponsor Packages:", packageData.length);
+  console.log("   Proposals:", proposalData.length);
+  console.log("   Invoices:", invoiceData.length);
   console.log("\nDone. Run `npm run dev` to view the platform.");
 }
 

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import type { VenuePin } from "@/components/MapContainer";
 
 const MapContainer = dynamic(() => import("@/components/MapContainer"), { ssr: false });
@@ -345,7 +346,7 @@ export default function MapPage() {
               <h2 className="text-white font-bold mt-1">Activation Locations</h2>
               <p className="text-slate-500 text-xs">{venues.filter(v => v.status === "active").length} active · {venues.length} total</p>
             </div>
-            <a href="/venues" className="btn-troptions text-xs py-1.5">Manage Venues →</a>
+            <Link href="/venues" className="btn-troptions text-xs py-1.5">Manage Venues →</Link>
           </div>
           <MapContainer venues={venues} height="460px" centerLat={33.749} centerLng={-84.388} zoom={11} />
         </div>

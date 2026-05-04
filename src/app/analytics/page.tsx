@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Stats {
   totalSponsors: number;
@@ -178,7 +179,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               ))}
-              {campaigns.length === 0 && <p className="text-slate-500 text-xs">No campaigns yet. <a href="/campaigns" className="text-[#00d4ff] hover:underline">Create one →</a></p>}
+              {campaigns.length === 0 && <p className="text-slate-500 text-xs">No campaigns yet. <Link href="/campaigns" className="text-[#00d4ff] hover:underline">Create one →</Link></p>}
             </div>
 
             <div className="card-dark p-5 space-y-3">
@@ -278,7 +279,7 @@ export default function AnalyticsPage() {
                   </tr>
                 ))}
                 {sponsors.length === 0 && (
-                  <tr><td colSpan={4} className="py-8 text-center text-slate-500">No sponsors yet. <a href="/sponsors" className="text-[#00d4ff] hover:underline">Add one →</a></td></tr>
+                  <tr><td colSpan={4} className="py-8 text-center text-slate-500">No sponsors yet. <Link href="/sponsors" className="text-[#00d4ff] hover:underline">Add one →</Link></td></tr>
                 )}
               </tbody>
             </table>
@@ -314,7 +315,7 @@ export default function AnalyticsPage() {
                   </tr>
                 ))}
                 {campaigns.length === 0 && (
-                  <tr><td colSpan={5} className="py-8 text-center text-slate-500">No campaigns yet. <a href="/campaigns" className="text-[#00d4ff] hover:underline">Create one →</a></td></tr>
+                  <tr><td colSpan={5} className="py-8 text-center text-slate-500">No campaigns yet. <Link href="/campaigns" className="text-[#00d4ff] hover:underline">Create one →</Link></td></tr>
                 )}
               </tbody>
             </table>

@@ -32,13 +32,25 @@ export async function listSponsors(status?: string): Promise<SponsorRow[]> {
   });
 }
 
-export async function getSponsor(id: string): Promise<SponsorRow | null> {
+export async function getSponsor(id: string) {
   return prisma.sponsor.findUnique({
     where: { id },
     include: {
       _count: { select: { campaigns: true, leads: true } },
-      campaigns: { orderBy: { createdAt: "desc" }, take: 10 },
+      campaigns: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          qrCodes: { select: { id: true, label: true, scans: true, redemptions: true } },
+          venue:   { select: { id: true, name: true } },
+        },
+      },
       leads: { orderBy: { createdAt: "desc" }, take: 10 },
+      proposals: {
+        orderBy: { createdAt: "desc" },
+        include: { package: { select: { name: true, monthlyFee: true } } },
+      },
+      invoices: { orderBy: { createdAt: "desc" } },
     },
   });
 }

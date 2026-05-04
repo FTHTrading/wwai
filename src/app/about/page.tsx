@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About TROPTIONS™ — AI + Blockchain + Sales Operating System",
@@ -114,8 +115,8 @@ export default function AboutPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <a href="/contact"   className="btn-troptions inline-flex">Get in Touch →</a>
-          <a href="/sponsors"  className="px-5 py-2.5 border border-[#d4a017]/50 text-[#d4a017] rounded-xl font-semibold text-sm hover:bg-[#d4a017]/10 transition-colors">Partner Portal</a>
-          <a href="/venues"    className="px-5 py-2.5 border border-[#162035] text-slate-300 rounded-xl font-semibold text-sm hover:bg-slate-800 transition-colors">Venue Network</a>
+          <Link href="/sponsors"  className="px-5 py-2.5 border border-[#d4a017]/50 text-[#d4a017] rounded-xl font-semibold text-sm hover:bg-[#d4a017]/10 transition-colors">Partner Portal</Link>
+          <Link href="/venues"    className="px-5 py-2.5 border border-[#162035] text-slate-300 rounded-xl font-semibold text-sm hover:bg-slate-800 transition-colors">Venue Network</Link>
         </div>
         <p className="text-slate-600 text-xs max-w-lg mx-auto">{TEAM_DISCLAIMER}</p>
       </section>

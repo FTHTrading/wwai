@@ -37,13 +37,24 @@ export async function listVenues(status?: string, category?: string): Promise<Ve
   });
 }
 
-export async function getVenue(id: string): Promise<VenueRow | null> {
+export async function getVenue(id: string) {
   return prisma.venue.findUnique({
     where: { id },
     include: {
       _count: { select: { campaigns: true, leads: true } },
-      campaigns: { orderBy: { createdAt: "desc" }, take: 10 },
-      leads:     { orderBy: { createdAt: "desc" }, take: 10 },
+      campaigns: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          sponsor: { select: { id: true, name: true } },
+          qrCodes: { select: { id: true, label: true, scans: true, redemptions: true, active: true } },
+        },
+      },
+      leads:    { orderBy: { createdAt: "desc" }, take: 10 },
+      proposals: {
+        orderBy: { createdAt: "desc" },
+        include: { sponsor: { select: { name: true } }, package: { select: { name: true } } },
+      },
     },
   });
 }
