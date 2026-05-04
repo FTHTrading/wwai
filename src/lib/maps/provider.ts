@@ -50,7 +50,10 @@ export interface ProviderConfig {
 export function readProviderConfig(): ProviderConfig {
   const env = (k: string) =>
     typeof process !== "undefined" ? process.env[k] : undefined;
-  const outdoor = (env("NEXT_PUBLIC_MAP_PROVIDER") || "demo") as MapProviderId;
+  // Default to MapLibre — free OSM tiles + OSRM routing, no API key needed.
+  // Set NEXT_PUBLIC_MAP_PROVIDER=demo to fall back to the built-in SVG.
+  const raw = (env("NEXT_PUBLIC_MAP_PROVIDER") || "").trim().toLowerCase();
+  const outdoor = (raw || "maplibre") as MapProviderId;
   const indoor =
     (env("NEXT_PUBLIC_INDOOR_PROVIDER") as ProviderConfig["indoor"]) || "demo";
   return {
