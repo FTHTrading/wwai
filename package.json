@@ -1,0 +1,45 @@
+{
+  "name": "fifa-troptions",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node setup-dashboard.cjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "npx tsx prisma/seed.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "deploy:vercel": "npx vercel deploy --prod=false --yes",
+    "deploy:vercel:prod": "npx vercel deploy --prod --yes",
+    "postinstall": "prisma generate",
+    "ai:health": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/health-check.ps1",
+    "ai:test:nim": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/test-nim-chat.ps1",
+    "ai:test:app": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/test-app-ai-routes.ps1 -Port 3002",
+    "docker:safe-status": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/docker-safe-status.ps1"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.3",
+    "@prisma/adapter-libsql": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "axios": "^1.15.2",
+    "better-sqlite3": "^12.9.0",
+    "dotenv": "^17.4.2",
+    "next": "16.2.4",
+    "prisma": "^7.8.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

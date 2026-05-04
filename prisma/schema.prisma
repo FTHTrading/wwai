@@ -1,0 +1,107 @@
+// FIFA Troptions — Prisma Schema
+// Player card trading + options platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ── Users / Wallets ─────────────────────────────────────────────
+model User {
+  id          String   @id @default(cuid())
+  address     String   @unique          // wallet public key / apostle agent UUID
+  chain       String   @default("apo")  // "apo" | "evm" | "sol"
+  displayName String?
+  createdAt   DateTime @default(now())
+
+  listings    Listing[]
+  bids        Bid[]
+  optionsBought  OptionContract[] @relation("Buyer")
+  optionsSold    OptionContract[] @relation("Seller")
+}
+
+// ── FIFA Player Cards ────────────────────────────────────────────
+model PlayerCard {
+  id          String   @id @default(cuid())
+  eaId        String   @unique          // EA FC / FIFA internal ID
+  name        String
+  club        String
+  league      String
+  nation      String
+  position    String
+  rating      Int
+  rarity      String   @default("gold") // gold | silver | bronze | special | icon | hero
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listings    Listing[]
+  options     OptionContract[]
+  priceHistory PriceSnapshot[]
+}
+
+// ── Market Listings (buy/sell order book) ───────────────────────
+model Listing {
+  id          String   @id @default(cuid())
+  cardId      String
+  sellerId    String
+  price       Float                     // in ATP
+  currency    String   @default("ATP")
+  quantity    Int      @default(1)
+  status      String   @default("open") // open | filled | cancelled
+  txHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  card        PlayerCard @relation(fields: [cardId], references: [id])
+  seller      User       @relation(fields: [sellerId], references: [id])
+  bids        Bid[]
+}
+
+model Bid {
+  id          String   @id @default(cuid())
+  listingId   String
+  bidderId    String
+  amount      Float
+  currency    String   @default("ATP")
+  status      String   @default("pending") // pending | accepted | rejected | expired
+  createdAt   DateTime @default(now())
+
+  listing     Listing @relation(fields: [listingId], references: [id])
+  bidder      User    @relation(fields: [bidderId], references: [id])
+}
+
+// ── Options Contracts ────────────────────────────────────────────
+model OptionContract {
+  id              String   @id @default(cuid())
+  cardId          String
+  buyerId         String
+  sellerId        String
+  strikePrice     Float                         // ATP
+  premium         Float                         // ATP paid upfront
+  currency        String   @default("ATP")
+  contractType    String   @default("call")     // call | put
+  expiresAt       DateTime
+  status          String   @default("open")     // open | exercised | expired | cancelled
+  exercisedTxHash String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  card    PlayerCard @relation(fields: [cardId], references: [id])
+  buyer   User       @relation("Buyer",  fields: [buyerId],  references: [id])
+  seller  User       @relation("Seller", fields: [sellerId], references: [id])
+}
+
+// ── Price History ────────────────────────────────────────────────
+model PriceSnapshot {
+  id        String   @id @default(cuid())
+  cardId    String
+  price     Float
+  source    String   @default("market") // market | futbin | futwiz
+  recordedAt DateTime @default(now())
+
+  card      PlayerCard @relation(fields: [cardId], references: [id])
+}

@@ -1,0 +1,32 @@
+{
+  "name": "TROPTIONS Event OS",
+  "short_name": "TROPTIONS",
+  "description": "AI-powered event sales, venue mapping, sponsor activation, and blockchain settlement.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#FFD700",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/troptions-logo-dark.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/troptions-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    { "name": "Venue Map",    "short_name": "Map",      "url": "/map",       "description": "TROPTIONS Mapping Intelligence" },
+    { "name": "Sponsors",     "short_name": "Sponsors", "url": "/sponsors",  "description": "Sponsor activation portal" },
+    { "name": "Field Sales",  "short_name": "Sales",    "url": "/sales",     "description": "Field Sales CRM & comms" },
+    { "name": "Dashboard",    "short_name": "Dash",     "url": "/dashboard", "description": "TROPTIONS Sales Dashboard" }
+  ]
+}
+

@@ -1,0 +1,14 @@
+name = "troptions-fifa"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+[vars]
+NEXT_PUBLIC_APP_NAME = "TROPTIONS"
+NEXT_PUBLIC_SITE_URL = "https://troptionsfifa.unykorn.org"
+
+# Secrets are set automatically by automate.cjs via CF API.
+# To set them manually: CF Dashboard → Pages → troptions-fifa → Settings → Env vars
+# Required for live DB: DATABASE_URL, DATABASE_AUTH_TOKEN
+# Required for live comms: TELNYX_API_KEY
+# Required for live payments: SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID
