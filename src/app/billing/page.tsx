@@ -2,6 +2,23 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface ProviderReadiness {
+  name:       string;
+  status:     "configured" | "unconfigured" | "partial";
+  configured: boolean;
+  envKeys:    string[];
+  missing:    string[];
+}
+
+interface PaymentStatus {
+  activeProvider: "square" | "stripe" | "manual";
+  providers: {
+    square:  ProviderReadiness & { configured: boolean };
+    stripe:  ProviderReadiness & { configured: boolean };
+    manual:  { configured: true };
+  };
+}
+
 interface Invoice {
   id:              string;
   invoiceNumber:   string;
@@ -28,15 +45,21 @@ const STATUS_COLOR: Record<string, string> = {
 const fmt = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function BillingPage() {
-  const [invoices,    setInvoices]    = useState<Invoice[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [loading,     setLoading]     = useState(true);
+  const [invoices,       setInvoices]       = useState<Invoice[]>([]);
+  const [filterStatus,   setFilterStatus]   = useState<string>("all");
+  const [loading,        setLoading]        = useState(true);
+  const [paymentStatus,  setPaymentStatus]  = useState<PaymentStatus | null>(null);
 
   useEffect(() => {
     fetch("/api/invoices")
       .then(r => r.json())
       .then(d => { setInvoices(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => setLoading(false));
+
+    fetch("/api/payment-status")
+      .then(r => r.json())
+      .then(d => setPaymentStatus(d))
+      .catch(() => {});
   }, []);
 
   const filtered   = filterStatus === "all" ? invoices : invoices.filter(i => i.status === filterStatus);
@@ -44,7 +67,9 @@ export default function BillingPage() {
   const totalSent  = invoices.filter(i => i.status === "sent").reduce((sum, i) => sum + i.amount, 0);
   const totalAll   = invoices.reduce((sum, i) => sum + i.amount, 0);
 
-  const isPaymentConfigured = false; // flip to true when SQUARE_ACCESS_TOKEN or STRIPE_SECRET_KEY is set
+  const squareOk  = paymentStatus?.providers.square.configured  ?? false;
+  const stripeOk  = paymentStatus?.providers.stripe.configured  ?? false;
+  const anyPaymentConfigured = squareOk || stripeOk;
 
   return (
     <div className="space-y-8">
@@ -65,7 +90,7 @@ export default function BillingPage() {
       </section>
 
       {/* Payment Provider Notice */}
-      {!isPaymentConfigured && (
+      {!anyPaymentConfigured && (
         <section className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-4 flex items-start gap-3">
           <span className="text-yellow-400 text-xl shrink-0 mt-0.5">⚠</span>
           <div>
@@ -73,7 +98,8 @@ export default function BillingPage() {
             <p className="text-yellow-500/80 text-xs mt-0.5">
               Set <code className="bg-yellow-500/10 px-1 rounded">SQUARE_ACCESS_TOKEN</code> or{" "}
               <code className="bg-yellow-500/10 px-1 rounded">STRIPE_SECRET_KEY</code> in <code className="bg-yellow-500/10 px-1 rounded">.env.local</code> to enable
-              live payments. Invoice tracking and manual status updates are fully functional.
+              live payments. Invoice tracking and manual status updates are fully functional.{" "}
+              <Link href="/settings/integrations" className="underline hover:text-yellow-300">View Integration Status →</Link>
             </p>
           </div>
         </section>
@@ -200,13 +226,15 @@ export default function BillingPage() {
         <div className="grid md:grid-cols-3 gap-4">
 
           {/* Square */}
-          <div className="card-dark rounded-xl border border-slate-700 overflow-hidden">
+          <div className={`card-dark rounded-xl overflow-hidden border ${squareOk ? "border-green-500/20" : "border-slate-700"}`}>
             <div className="border-b border-[#162035] px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-white text-xs font-black">SQ</div>
                 <span className="text-white font-semibold text-sm">Square</span>
               </div>
-              <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>
+              {squareOk
+                ? <span className="text-[10px] font-bold text-green-400 border border-green-400/30 bg-green-400/10 px-2 py-0.5 rounded">Configured</span>
+                : <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>}
             </div>
             <div className="p-4 space-y-3">
               <p className="text-slate-500 text-xs">Accept card payments and ACH via Square point-of-sale and invoicing API.</p>
@@ -214,20 +242,26 @@ export default function BillingPage() {
                 <p className="text-slate-600 text-[10px] uppercase tracking-widest">Required env var</p>
                 <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">SQUARE_ACCESS_TOKEN</code>
               </div>
-              <button disabled className="w-full px-3 py-2 bg-slate-800 text-slate-600 rounded-lg text-xs font-semibold cursor-not-allowed border border-slate-700">
-                Create Payment Link — Not configured
+              <button disabled={!squareOk}
+                className={`w-full px-3 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                  squareOk
+                    ? "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20"
+                    : "bg-slate-800 text-slate-600 cursor-not-allowed border-slate-700"}`}>
+                {squareOk ? "Create Payment Link" : "Create Payment Link — Not configured"}
               </button>
             </div>
           </div>
 
           {/* Stripe */}
-          <div className="card-dark rounded-xl border border-slate-700 overflow-hidden">
+          <div className={`card-dark rounded-xl overflow-hidden border ${stripeOk ? "border-green-500/20" : "border-slate-700"}`}>
             <div className="border-b border-[#162035] px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-purple-400 text-xs font-black">ST</div>
                 <span className="text-white font-semibold text-sm">Stripe</span>
               </div>
-              <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>
+              {stripeOk
+                ? <span className="text-[10px] font-bold text-green-400 border border-green-400/30 bg-green-400/10 px-2 py-0.5 rounded">Configured</span>
+                : <span className="text-[10px] font-bold text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Not configured</span>}
             </div>
             <div className="p-4 space-y-3">
               <p className="text-slate-500 text-xs">Invoicing, subscriptions, and card payments via Stripe. Supports recurring billing.</p>
@@ -236,8 +270,12 @@ export default function BillingPage() {
                 <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">STRIPE_SECRET_KEY</code>
                 <code className="text-[#00d4ff] text-[11px] font-mono bg-[#050810] px-2 py-1 rounded border border-[#162035] block">STRIPE_PUBLISHABLE_KEY</code>
               </div>
-              <button disabled className="w-full px-3 py-2 bg-slate-800 text-slate-600 rounded-lg text-xs font-semibold cursor-not-allowed border border-slate-700">
-                Create Payment Link — Not configured
+              <button disabled={!stripeOk}
+                className={`w-full px-3 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                  stripeOk
+                    ? "bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20"
+                    : "bg-slate-800 text-slate-600 cursor-not-allowed border-slate-700"}`}>
+                {stripeOk ? "Create Payment Link" : "Create Payment Link — Not configured"}
               </button>
             </div>
           </div>

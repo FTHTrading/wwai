@@ -33,11 +33,12 @@ const NAV_LINKS = [
   { href: "/demo",          label: "Demo" },
   { href: "/case-studies",  label: "Case Studies" },
   { href: "/proposals",     label: "Proposals" },
-  { href: "/billing",       label: "Billing" },
-  { href: "/analytics",     label: "Analytics" },
-  { href: "/sales",         label: "Sales Engine" },
-  { href: "/contact",       label: "Contact" },
-  { href: "/dashboard",     label: "Dashboard",     cta: true },
+  { href: "/billing",                label: "Billing" },
+  { href: "/analytics",              label: "Analytics" },
+  { href: "/sales",                  label: "Sales Engine" },
+  { href: "/settings/integrations",  label: "Integrations" },
+  { href: "/contact",                label: "Contact" },
+  { href: "/dashboard",              label: "Dashboard",     cta: true },
 ];
 
 const MOBILE_NAV = [

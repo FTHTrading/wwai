@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { getSystemReadiness } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Launch Readiness — TROPTIONS™ Deployment Checklist",
@@ -67,11 +69,26 @@ const DEPLOY_STEPS = [
 function StatusBadge({ ok }: { ok: boolean | null }) {
   if (ok === null) return <span className="text-slate-600 text-xs">Manual check</span>;
   return ok
-    ? <span className="text-green-400 text-xs font-semibold">Detected</span>
-    : <span className="text-[#d4a017] text-xs font-semibold">Not set</span>;
+    ? <span className="text-green-400 text-xs font-semibold">✓ Set</span>
+    : <span className="text-[#d4a017] text-xs font-semibold">⚠ Not set</span>;
 }
 
-export default function LaunchPage() {
+export default async function LaunchPage() {
+  const readiness = getSystemReadiness();
+
+  // Build a flat map of env key → configured boolean for badge rendering
+  const envStatus: Record<string, boolean> = {
+    DATABASE_URL:           readiness.database.mode === "remote",
+    NEXTAUTH_SECRET:        readiness.auth.secretOk,
+    NEXTAUTH_URL:           readiness.auth.urlOk,
+    SQUARE_ACCESS_TOKEN:    readiness.payments.square.configured,
+    STRIPE_SECRET_KEY:      readiness.payments.stripe.configured,
+    STRIPE_PUBLISHABLE_KEY: !readiness.payments.stripe.missing.includes("STRIPE_PUBLISHABLE_KEY"),
+    ZOHO_CLIENT_ID:         readiness.crm.zoho.configured,
+    HUBSPOT_ACCESS_TOKEN:   readiness.crm.hubspot.configured,
+    AIRTABLE_API_KEY:       readiness.crm.airtable.configured,
+    SENDGRID_API_KEY:       readiness.email.configured,
+  };
 
   return (
     <div className="space-y-10">
@@ -111,7 +128,7 @@ export default function LaunchPage() {
                   </div>
                   <div className="shrink-0 pt-1">
                     {c.envKey ? (
-                      <StatusBadge ok={null} />
+                      <StatusBadge ok={envStatus[c.envKey] ?? null} />
                     ) : (
                       <span className="text-slate-600 text-xs">Manual check</span>
                     )}
@@ -121,6 +138,18 @@ export default function LaunchPage() {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* Quick link to full integrations page */}
+      <section className="card-dark rounded-2xl p-5 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-white font-semibold text-sm">View full integration status</p>
+          <p className="text-slate-500 text-xs">Provider-by-provider readiness with missing env key details</p>
+        </div>
+        <Link href="/settings/integrations"
+          className="px-4 py-2 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30 rounded-xl text-sm font-semibold hover:bg-[#00d4ff]/20 transition-colors whitespace-nowrap">
+          Integrations →
+        </Link>
       </section>
 
       {/* Deploy Steps */}
