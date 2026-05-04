@@ -463,3 +463,22 @@ body {
   justify-content: center;
   flex-shrink: 0;
 }
+
+/* ── WWAI / TROPTIONS v2 utilities ─────────────────────────────────────── */
+.wwai-panel { background: rgba(7,17,31,0.85); border: 1px solid rgba(0,213,255,0.18); border-radius: 1rem; backdrop-filter: blur(8px); }
+.wwai-card  { background: #0b1220; border: 1px solid #162035; border-radius: 1rem; transition: border-color .2s, transform .2s; }
+.wwai-card:hover { border-color: rgba(0,213,255,0.4); transform: translateY(-2px); }
+.wwai-card-gold { border-color: rgba(214,168,79,0.45); box-shadow: 0 0 24px rgba(214,168,79,0.08); }
+.wwai-chip { display:inline-flex; align-items:center; gap:.25rem; padding:.15rem .55rem; border-radius:9999px; font-size:.7rem; letter-spacing:.04em; text-transform:uppercase; border:1px solid #162035; color:#9fb3c8; }
+.wwai-chip-cyan { color:#00d5ff; border-color:rgba(0,213,255,.4); background:rgba(0,213,255,.06); }
+.wwai-chip-gold { color:#d6a84f; border-color:rgba(214,168,79,.45); background:rgba(214,168,79,.07); }
+.wwai-chip-green { color:#34d399; border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.07); }
+.wwai-chip-red { color:#ff6b6b; border-color:rgba(255,77,77,.4); background:rgba(255,77,77,.07); }
+.wwai-chip-amber { color:#ffbf5f; border-color:rgba(255,191,95,.4); background:rgba(255,191,95,.07); }
+.wwai-btn-primary { background:#00d5ff; color:#020611; font-weight:700; padding:.55rem 1.1rem; border-radius:.6rem; transition:.2s; }
+.wwai-btn-primary:hover { background:#22d3ee; box-shadow: 0 0 20px rgba(0,213,255,.35); }
+.wwai-btn-ghost { border:1px solid #162035; color:#cbd5e1; padding:.5rem 1rem; border-radius:.6rem; transition:.2s; }
+.wwai-btn-ghost:hover { border-color:#00d5ff; color:#fff; }
+.wwai-btn-disabled { background:#0b1220; color:#475569; padding:.55rem 1.1rem; border-radius:.6rem; border:1px dashed #1e293b; cursor:not-allowed; }
+.hud-grid-bg { background-image: radial-gradient(circle at 25% 25%, rgba(0,213,255,0.06), transparent 60%), linear-gradient(rgba(0,213,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,213,255,0.04) 1px, transparent 1px); background-size: auto, 40px 40px, 40px 40px; }
+.disclaimer-bar { font-size:.7rem; color:#7c8aa0; border:1px solid #162035; background:#0a1220; padding:.5rem .8rem; border-radius:.5rem; }
