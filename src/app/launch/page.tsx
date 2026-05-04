@@ -1,4 +1,5 @@
 import AppShell from "@/components/layout/AppShell";
+import DemoWarning from "@/components/layout/DemoWarning";
 
 const SECTIONS = [
   {
@@ -31,6 +32,7 @@ export default function LaunchPage() {
       subtitle="Everything required to take this demo from sales-ready to production in a real event city."
       badges={["Operator handoff"]}
     >
+      <DemoWarning />
       <div className="wwai-panel p-4 mb-5 text-sm text-slate-300">
         <span className="text-cyan-300 font-bold">Production handoff.</span>{" "}
         Today: TROPTIONS is sales-ready as a demo — packages, registration, proposals, admin, analytics, billing,

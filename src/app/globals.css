@@ -482,3 +482,23 @@ body {
 .wwai-btn-disabled { background:#0b1220; color:#475569; padding:.55rem 1.1rem; border-radius:.6rem; border:1px dashed #1e293b; cursor:not-allowed; }
 .hud-grid-bg { background-image: radial-gradient(circle at 25% 25%, rgba(0,213,255,0.06), transparent 60%), linear-gradient(rgba(0,213,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,213,255,0.04) 1px, transparent 1px); background-size: auto, 40px 40px, 40px 40px; }
 .disclaimer-bar { font-size:.7rem; color:#7c8aa0; border:1px solid #162035; background:#0a1220; padding:.5rem .8rem; border-radius:.5rem; }
+
+/* ─────────────────────────────────────────────
+   Print styles — proposal export
+   ───────────────────────────────────────────── */
+@media print {
+  body { background: white !important; color: #0a1220 !important; }
+  nav, footer, .no-print { display: none !important; }
+  .hud-grid-bg { background: white !important; padding: 0 !important; margin: 0 !important; }
+  .wwai-panel { background: white !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; color: #0a1220 !important; page-break-inside: avoid; }
+  .wwai-panel * { color: #0a1220 !important; }
+  .wwai-chip { border: 1px solid #94a3b8 !important; background: white !important; color: #0a1220 !important; }
+  .wwai-btn-primary, .wwai-btn-ghost, .wwai-btn-disabled { display: none !important; }
+  .disclaimer-bar { color: #475569 !important; border: 1px dashed #94a3b8 !important; background: white !important; }
+  .print-only { display: block !important; }
+  h1, h2, h3 { color: #0a1220 !important; }
+  a { color: #1d4ed8 !important; text-decoration: underline; }
+  .print-header { display: flex !important; align-items: center; justify-content: space-between; border-bottom: 2px solid #0a1220; margin-bottom: 16px; padding-bottom: 8px; }
+}
+.print-only { display: none; }
+

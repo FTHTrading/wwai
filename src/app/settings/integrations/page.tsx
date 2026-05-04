@@ -1,4 +1,5 @@
 import AppShell from "@/components/layout/AppShell";
+import DemoWarning from "@/components/layout/DemoWarning";
 import { getSystemReadiness, type ProviderReadiness } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,7 @@ export default function IntegrationsPage() {
       subtitle="Single source of truth for what is connected and what still needs credentials. Values are never displayed — only readiness flags and required env keys."
       badges={[r.environment, "Demo-safe"]}
     >
+      <DemoWarning message="Provider keys shown here are read from server env only. Never paste secrets into the UI." />
       <div className="wwai-panel p-4 mb-6 text-sm text-slate-300">
         <span className="text-cyan-300 font-bold">How readiness works.</span>{" "}
         Each row checks <code className="text-cyan-300">process.env</code> for the listed keys. No secret values leave the server. Set keys in
