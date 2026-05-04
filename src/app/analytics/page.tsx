@@ -11,6 +11,8 @@ interface Stats {
   totalCampaigns: number;
   activeCampaigns: number;
   totalRedemptions: number;
+  totalScans: number;
+  sponsorRevenue: number;
   totalDeals: number;
   totalCommissions: number;
   payoutsProcessed: number;
@@ -65,14 +67,14 @@ export default function AnalyticsPage() {
   const pipelineValue = leads.reduce((acc, l) => acc + (l.estimatedValue ?? 0), 0);
 
   const KPIS = stats ? [
-    { label: "Active Sponsors",   value: stats.activeSponsors,  sub: `${stats.totalSponsors} total`,     color: "text-[#d4a017]" },
-    { label: "Active Venues",     value: stats.activeVenues,    sub: `${stats.totalVenues} total`,       color: "text-[#00d4ff]" },
-    { label: "Open Leads",        value: stats.newLeads,        sub: `${stats.totalLeads} total`,        color: "text-purple-400" },
-    { label: "Active Campaigns",  value: stats.activeCampaigns, sub: `${stats.totalCampaigns} total`,   color: "text-green-400" },
-    { label: "QR Redemptions",    value: stats.totalRedemptions,sub: "all time",                        color: "text-[#d4a017]" },
-    { label: "Pipeline Value",    value: fmt(pipelineValue),    sub: "est. from leads",                 color: "text-[#00d4ff]" },
-    { label: "Commissions",       value: fmt(stats.totalCommissions), sub: "2% fee model",             color: "text-green-400" },
-    { label: "Volume Processed",  value: fmt(stats.totalVolume),sub: "filled listings",                 color: "text-purple-400" },
+    { label: "Active Sponsors",   value: stats.activeSponsors,         sub: `${stats.totalSponsors} total`,  color: "text-[#d4a017]" },
+    { label: "Sponsor Revenue",   value: fmt(stats.sponsorRevenue),    sub: "committed budget",              color: "text-[#FFD700]" },
+    { label: "Active Venues",     value: stats.activeVenues,           sub: `${stats.totalVenues} total`,    color: "text-[#00d4ff]" },
+    { label: "Open Leads",        value: stats.newLeads,               sub: `${stats.totalLeads} total`,     color: "text-purple-400" },
+    { label: "Active Campaigns",  value: stats.activeCampaigns,        sub: `${stats.totalCampaigns} total`, color: "text-green-400" },
+    { label: "QR Scans",          value: stats.totalScans,             sub: "all campaigns",                 color: "text-[#00d4ff]" },
+    { label: "QR Redemptions",    value: stats.totalRedemptions,       sub: "all time",                      color: "text-[#d4a017]" },
+    { label: "Pipeline Value",    value: fmt(pipelineValue),           sub: "est. from leads",               color: "text-purple-400" },
   ] : [];
 
   const TABS = [
@@ -200,6 +202,23 @@ export default function AnalyticsPage() {
 
         {/* Leads Table */}
         {tab === "leads" && (
+          <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-slate-400 text-xs">{leads.length} leads in pipeline</p>
+            <button
+              onClick={() => {
+                const rows = [["Name","Company","Type","Status","Est. Value","Date"],
+                  ...leads.map(l => [l.name, l.company ?? "", l.type, l.status, l.estimatedValue ? String(l.estimatedValue) : "", new Date(l.createdAt).toLocaleDateString()])];
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement("a"); a.href = url; a.download = "troptions-leads.csv"; a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="btn-troptions text-xs py-1.5">
+              ⬇ Export CSV
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -231,6 +250,7 @@ export default function AnalyticsPage() {
                 )}
               </tbody>
             </table>
+          </div>
           </div>
         )}
 

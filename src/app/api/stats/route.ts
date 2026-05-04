@@ -5,7 +5,8 @@ export async function GET() {
   const [
     cardsListed, openOptions, volume, activeTraders, totalDeals, totalCommissions, payoutsProcessed,
     totalSponsors, activeSponsors, totalVenues, activeVenues,
-    totalLeads, newLeads, totalCampaigns, activeCampaigns, totalRedemptions,
+    totalLeads, newLeads, totalCampaigns, activeCampaigns, totalRedemptions, totalScans,
+    sponsorBudget,
   ] = await Promise.all([
     prisma.listing.count({ where: { status: "open" } }),
     prisma.optionContract.count({ where: { status: "open" } }),
@@ -24,6 +25,8 @@ export async function GET() {
     prisma.campaign.count(),
     prisma.campaign.count({ where: { status: "active" } }),
     prisma.qrEvent.count({ where: { eventType: "redeem" } }),
+    prisma.qrEvent.count({ where: { eventType: "scan" } }),
+    prisma.sponsor.aggregate({ _sum: { budget: true } }),
   ]);
 
   return NextResponse.json({
@@ -44,6 +47,8 @@ export async function GET() {
     totalCampaigns,
     activeCampaigns,
     totalRedemptions,
+    totalScans,
+    sponsorRevenue: sponsorBudget._sum.budget ?? 0,
   });
 }
 

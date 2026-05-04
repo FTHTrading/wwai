@@ -1,5 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import type { VenuePin } from "@/components/MapContainer";
+
+const MapContainer = dynamic(() => import("@/components/MapContainer"), { ssr: false });
 
 const LANGUAGES = [
   "English","Español","Français","العربية","Português","isiZulu",
@@ -44,6 +48,14 @@ export default function MapPage() {
   const [selected,  setSelected]  = useState<number | null>(1);
   const [language,  setLanguage]  = useState("English");
   const [routing,   setRouting]   = useState(false);
+  const [venues,    setVenues]    = useState<VenuePin[]>([]);
+
+  useEffect(() => {
+    fetch("/api/venues")
+      .then(r => r.json())
+      .then(d => setVenues(Array.isArray(d) ? d : []))
+      .catch(console.error);
+  }, []);
 
   const sel = LOCATIONS.find((l) => l.id === selected);
   const tc  = sel ? TYPE_COLOR[sel.type] : null;
@@ -323,6 +335,21 @@ export default function MapPage() {
           </div>
         </div>
       </div>
+
+      {/* Venue Network Map */}
+      {venues.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="pill-gold text-xs">TROPTIONS Venue Network</span>
+              <h2 className="text-white font-bold mt-1">Activation Locations</h2>
+              <p className="text-slate-500 text-xs">{venues.filter(v => v.status === "active").length} active · {venues.length} total</p>
+            </div>
+            <a href="/venues" className="btn-troptions text-xs py-1.5">Manage Venues →</a>
+          </div>
+          <MapContainer venues={venues} height="460px" centerLat={33.749} centerLng={-84.388} zoom={11} />
+        </div>
+      )}
     </div>
   );
 }

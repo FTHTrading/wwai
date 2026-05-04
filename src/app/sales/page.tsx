@@ -171,6 +171,22 @@ export default function SalesPage() {
       {/* ── Lead Tracker ── */}
       {activeTab === "leads" && (
         <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-slate-500 text-xs">{leads.length} leads in pipeline</p>
+            <button
+              onClick={() => {
+                const rows = [["Name","Company","Phone","Email","Status","Est. Value","Date"],
+                  ...leads.map(l => [l.name, l.company ?? "", l.phone ?? "", l.email ?? "", l.status, l.estimatedValue ? String(l.estimatedValue) : "", new Date(l.createdAt).toLocaleDateString()])];
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement("a"); a.href = url; a.download = "troptions-leads.csv"; a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="btn-troptions text-xs py-1.5">
+              ⬇ Export CSV
+            </button>
+          </div>
           {leadsLoading && <p className="text-slate-500 text-sm text-center py-6">Loading leads…</p>}
           {!leadsLoading && leads.map((lead) => (
             <div key={lead.id} className="card-dark-hover rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
