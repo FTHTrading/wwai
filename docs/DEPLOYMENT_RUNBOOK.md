@@ -12,7 +12,7 @@ Copy `.env.example` to `.env.local` (dev) or set in your hosting provider's dash
 |----------|----------|-------|
 | `DATABASE_URL` | Yes | `file:./prisma/dev.db` for local; Turso `libsql://...` for production |
 | `NEXTAUTH_SECRET` | Yes | `openssl rand -hex 32` |
-| `NEXTAUTH_URL` | Yes | Full URL: `https://yourdomain.com` |
+| `NEXTAUTH_URL` | Yes | Full URL: `https://troptionslive.unykorn.org` |
 | `SQUARE_ACCESS_TOKEN` | Optional | Enable Square payments |
 | `STRIPE_SECRET_KEY` | Optional | Enable Stripe payments |
 | `STRIPE_PUBLISHABLE_KEY` | Optional | Required alongside STRIPE_SECRET_KEY for client elements |

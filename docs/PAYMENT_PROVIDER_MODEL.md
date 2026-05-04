@@ -66,7 +66,7 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const link = await stripe.paymentLinks.create({
   line_items: [{ price_data: { currency: opts.currency.toLowerCase(), product_data: { name: opts.description }, unit_amount: Math.round(opts.amount * 100) }, quantity: 1 }],
-  after_completion: { type: "redirect", redirect: { url: opts.successUrl ?? "https://yourdomain.com/billing" } },
+  after_completion: { type: "redirect", redirect: { url: opts.successUrl ?? "https://troptionslive.unykorn.org/billing" } },
 });
 return { ok: true, provider: "stripe", url: link.url, error: null };
 ```

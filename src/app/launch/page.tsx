@@ -23,7 +23,7 @@ const ITEMS = [
     color: "#00d4ff",
     checks: [
       { label: "NEXTAUTH_SECRET set",           detail: "Required for session security. Run `openssl rand -hex 32` to generate",  envKey: "NEXTAUTH_SECRET" },
-      { label: "NEXTAUTH_URL configured",       detail: "Must match production URL (e.g. https://yourdomain.com)",                envKey: "NEXTAUTH_URL" },
+      { label: "NEXTAUTH_URL configured",       detail: "Must match production URL (e.g. https://troptionslive.unykorn.org)",                envKey: "NEXTAUTH_URL" },
       { label: "NODE_ENV=production in deploy", detail: "Set automatically by Vercel/Cloudflare. Verify if self-hosting",         envKey: "NODE_ENV" },
     ],
   },
@@ -176,7 +176,7 @@ export default async function LaunchPage() {
         <pre className="text-[11px] text-slate-400 font-mono bg-[#050810] rounded-xl p-4 border border-[#162035] overflow-x-auto leading-6">{`# Core
 DATABASE_URL="file:./prisma/dev.db"
 NEXTAUTH_SECRET="your-secret-here"
-NEXTAUTH_URL="https://yourdomain.com"
+NEXTAUTH_URL="https://troptionslive.unykorn.org"
 
 # Payment (optional)
 SQUARE_ACCESS_TOKEN="EAAAl..."

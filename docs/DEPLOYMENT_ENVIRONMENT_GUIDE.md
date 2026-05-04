@@ -25,7 +25,7 @@ npm run build
 |---|---|---|
 | `DATABASE_URL` | Database connection string | `file:./prisma/dev.db` or Turso libsql URL |
 | `NEXTAUTH_SECRET` | Session signing key (32+ random bytes) | `openssl rand -hex 32` |
-| `NEXTAUTH_URL` | Full production URL | `https://troptions.yourdomain.com` |
+| `NEXTAUTH_URL` | Full production URL | `https://troptionslive.unykorn.org` |
 
 ### Optional — Payment Providers
 

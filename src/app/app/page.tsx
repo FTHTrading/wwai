@@ -47,8 +47,8 @@ export default function AppPage() {
         </p>
         <div className="grid sm:grid-cols-2 gap-4 max-w-md mx-auto text-left">
           {[
-          { os: "iOS (Safari)", steps: ["Open troptions.unykorn.org in Safari", "Tap the Share icon (□↑)", "Tap 'Add to Home Screen'", "Tap 'Add'"] },
-            { os: "Android (Chrome)", steps: ["Open troptions.unykorn.org in Chrome", "Tap the menu (⋮)", "Tap 'Add to Home Screen'", "Tap 'Install'"] },
+          { os: "iOS (Safari)", steps: ["Open troptionslive.unykorn.org in Safari", "Tap the Share icon (□↑)", "Tap 'Add to Home Screen'", "Tap 'Add'"] },
+            { os: "Android (Chrome)", steps: ["Open troptionslive.unykorn.org in Chrome", "Tap the menu (⋮)", "Tap 'Add to Home Screen'", "Tap 'Install'"] },
           ].map(({ os, steps }) => (
             <div key={os} className="card-dark rounded-xl p-4 space-y-2">
               <p className="text-sm font-bold text-cyan-400">{os}</p>
