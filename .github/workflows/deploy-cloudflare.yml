@@ -41,9 +41,6 @@ jobs:
       contents: read
       deployments: write
 
-    # Skips silently when CF secrets are not yet configured.
-    if: ${{ secrets.CF_API_TOKEN != '' && secrets.CF_ACCOUNT_ID != '' }}
-
     steps:
       - uses: actions/checkout@v4
 
