@@ -52,3 +52,6 @@ create-dashboard.bat
 .vercel/
 
 .vercel
+
+# Local Netlify folder
+.netlify
