@@ -14,8 +14,10 @@ const TYPES = [
 export default function RegisterPage() {
   return (
     <AppShell
+      brand="whichway"
+      eyebrow="Join the Network"
       title="Register Your Business"
-      subtitle="Self-serve registration for the seven business types in the TROPTIONS network. Operator review required before going live."
+      subtitle="Self-serve registration for the seven business types in the WhichWay / WWAI network — powered by TROPTIONS. Operator review required before going live."
       badges={["Demo registration", "Operator-reviewed in production"]}
     >
       <section className="wwai-panel p-5 mb-6">

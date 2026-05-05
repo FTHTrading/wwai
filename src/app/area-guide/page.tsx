@@ -48,8 +48,10 @@ export default function AreaGuidePage() {
 
   return (
     <AppShell
-      title="Area Guide"
-      subtitle="Hotels, restaurants, bars, family spots, transportation, and sponsor offers around the event zone."
+      brand="whichway"
+      eyebrow="Area Guide"
+      title="Around the Event"
+      subtitle="Hotels, restaurants, bars, family spots, transportation, and sponsor offers around the event zone — curated by WhichWay AI."
       badges={["Demo data", "Verified partners labeled"]}
     >
       <div className="grid lg:grid-cols-[260px_1fr] gap-5">

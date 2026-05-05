@@ -5,9 +5,11 @@ import VenueMap from "@/components/map/VenueMap";
 export default function SafetyRoutesPage() {
   return (
     <AppShell
+      brand="whichway"
+      eyebrow="Safety-Informed Routes"
       title="Safety-Informed Route Planner"
-      subtitle="Build a hotel→seat or seat→hotel demo route with checkpoints, pickup, accessibility, and language. Operator-reviewed in production."
-      badges={["Safety-informed", "Demo only"]}
+      subtitle="Build a hotel→seat or seat→hotel demo route with checkpoints, pickup, accessibility, and language. Operator-reviewed in production — no guaranteed-safe claims."
+      badges={["Safety-informed", "Demo route", "Operator-reviewed in production"]}
     >
       <div className="wwai-panel p-4 mb-5 text-sm text-slate-300">
         <span className="text-cyan-300 font-bold">Guest step.</span>{" "}

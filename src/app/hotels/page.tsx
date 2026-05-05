@@ -5,7 +5,9 @@ import Link from "next/link";
 export default function HotelsPage() {
   return (
     <AppShell
-      title="Hotel Network"
+      brand="whichway"
+      eyebrow="Hotel Routes"
+      title="Where to Stay"
       subtitle="Verified hotels with guest route packages, concierge integration, and safety-informed pickup zones."
       badges={["Demo data"]}
     >

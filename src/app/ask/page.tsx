@@ -10,8 +10,10 @@ export const metadata = {
 export default function AskPage() {
   return (
     <AppShell
-      title="Ask WWAI"
-      subtitle="Voice or text — in 8 languages. WWAI finds food, hotels, bars, pickup zones, sponsor offers, and safety-informed routes."
+      brand="whichway"
+      eyebrow="WWAI Concierge"
+      title="Ask WhichWay AI"
+      subtitle="Not sure where to go? WhichWay AI knows. Voice or text — in 8 languages. Finds food, hotels, bars, pickup zones, sponsor offers, and safety-informed routes."
       badges={["Voice ready", "8 languages", "Safety-informed", "Demo build"]}
     >
       <div className="max-w-2xl mx-auto space-y-6">

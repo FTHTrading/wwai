@@ -5,8 +5,10 @@ import Link from "next/link";
 export default function DriversPage() {
   return (
     <AppShell
-      title="Drivers & Transportation"
-      subtitle="Verified drivers, shuttle operators, and pickup zone partners. TROPTIONS is independent and not affiliated with any rideshare brand."
+      brand="whichway"
+      eyebrow="Driver Pickup"
+      title="How to Get There"
+      subtitle="Verified drivers, shuttle operators, and pickup zone partners. WhichWay AI is an independent platform and not affiliated with any rideshare brand."
       badges={["Independent platform"]}
     >
       <p className="disclaimer-bar mb-4">Not affiliated with Uber, Lyft, or other rideshare brands.</p>

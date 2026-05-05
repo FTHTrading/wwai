@@ -5,8 +5,10 @@ import Link from "next/link";
 export default function RestaurantsPage() {
   return (
     <AppShell
-      title="Restaurant Network"
-      subtitle="Verified restaurants near event zones with QR offers and family-friendly listings."
+      brand="whichway"
+      eyebrow="Restaurant Discovery"
+      title="Where to Eat"
+      subtitle="Verified restaurants near event zones with QR offers and family-friendly listings — curated by WhichWay AI."
       badges={["Demo data"]}
     >
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

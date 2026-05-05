@@ -1,23 +1,25 @@
 import AppShell from "@/components/layout/AppShell";
 import WWAIVoiceConcierge from "@/components/agent/WWAIVoiceConcierge";
+import WhichWayLiveLogo from "@/components/brand/WhichWayLiveLogo";
 
 export default function WWAIPage() {
   return (
     <AppShell
+      brand="whichway"
+      eyebrow="WWAI Concierge"
       title="Not sure where to go? WhichWay AI knows."
       subtitle="WWAI is the AI concierge for event cities — finding restaurants, hotels, bars, pickup zones, sponsor offers, language support, and safety-informed routes from hotel to seat and seat to hotel."
-      badges={["Demo concierge", "8 demo languages", "Powered by TROPTIONS"]}
+      badges={["Demo concierge", "8 demo languages"]}
     >
       <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
-        <div className="hidden lg:flex justify-center wwai-panel p-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/wwai-logo.png"
-            alt="WWAI"
-            width={220}
-            height={220}
-            className="object-contain drop-shadow-[0_0_30px_rgba(0,213,255,0.45)]"
-          />
+        <div className="hidden lg:flex flex-col items-center justify-center wwai-panel p-6 gap-3">
+          <WhichWayLiveLogo size={180} variant="gradient" />
+          <div className="text-[10px] uppercase tracking-[0.3em] text-slate-500 text-center">
+            whichway.live
+          </div>
+          <div className="text-[10px] uppercase tracking-widest text-slate-600 text-center">
+            Powered by TROPTIONS
+          </div>
         </div>
         <WWAIVoiceConcierge />
       </div>

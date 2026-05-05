@@ -5,7 +5,9 @@ import Link from "next/link";
 export default function BarsPage() {
   return (
     <AppShell
-      title="Bars & Nightlife"
+      brand="whichway"
+      eyebrow="Bars & Nightlife"
+      title="After Hours"
       subtitle="Business directory of nightlife venues with safety-informed late-night pickup notes. Age-restricted entries clearly labeled."
       badges={["21+ where applicable", "Demo data"]}
     >

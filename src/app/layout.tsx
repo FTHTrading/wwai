@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import WhichWayLiveLogo from "@/components/brand/WhichWayLiveLogo";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -62,14 +63,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="container mx-auto px-4 py-8 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/brand/wwai-logo.png"
-                  alt="WWAI"
-                  width={56}
-                  height={56}
-                  className="h-12 w-12 object-contain opacity-90"
-                />
+                <WhichWayLiveLogo size={48} variant="gradient" />
                 <div>
                   <div className="font-extrabold text-white text-lg">TROPTIONS<span className="text-[10px] align-super text-slate-500">™</span> · WWAI</div>
                   <div className="text-xs text-slate-500">WWAI by TROPTIONS — One city. One crowd. One operating system.</div>
