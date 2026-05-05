@@ -146,7 +146,7 @@ export function buildDeterministicAnswer(
       return `Accessibility support is available at designated nodes (demo data).\n\nPlease visit the Guest Support Node in the Downtown zone or ask an event staff member for ADA route assistance.\n\nFor emergencies, contact local emergency services immediately.`;
 
     case "what_is_wwai":
-      return `**WWAI — WhichWay AI** is the guest-facing AI concierge powered by TROPTIONS.\n\n_"Nowhere to go? WhichWay AI knows."_\n\nI help guests:\n• Find restaurants, bars, and hotels near the venue\n• Navigate pickup zones and safety-informed routes\n• Discover sponsor offers and QR deals\n• Register businesses and transportation services\n\nI run on TROPTIONS GuestOps — a real-time venue intelligence platform.`;
+      return `**WWAI — WhichWay AI** is the guest-facing AI concierge powered by TROPTIONS.\n\n_"Not sure where to go? WhichWay AI knows."_\n\nI help guests:\n• Find restaurants, bars, and hotels near the venue\n• Navigate pickup zones and safety-informed routes\n• Discover sponsor offers and QR deals\n• Register businesses and transportation services\n\nI run on TROPTIONS GuestOps — a real-time venue intelligence platform.`;
 
     case "what_is_troptions":
       return `**TROPTIONS** is the backend SalesOS + GuestOps platform that powers WWAI.\n\nTROPTIONS manages sponsor campaigns, merchant onboarding, hotel routing, driver coordination, and the AI concierge layer that guests interact with.\n\nVisit **/about** to learn more.`;

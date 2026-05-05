@@ -4,7 +4,7 @@ import WWAIConcierge from "@/components/agent/WWAIConcierge";
 export default function WWAIPage() {
   return (
     <AppShell
-      title="Nowhere to go? WhichWay AI knows."
+      title="Not sure where to go? WhichWay AI knows."
       subtitle="WWAI is the AI concierge for event cities — finding restaurants, hotels, bars, pickup zones, sponsor offers, language support, and safety-informed routes from hotel to seat and seat to hotel."
       badges={["Demo concierge", "8 demo languages", "Powered by TROPTIONS"]}
     >

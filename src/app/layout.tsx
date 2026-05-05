@@ -67,7 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <div>
                   <div className="font-extrabold text-white text-lg">TROPTIONS<span className="text-[10px] align-super text-slate-500">™</span> · WWAI</div>
                   <div className="text-xs text-slate-500">WWAI by TROPTIONS — One city. One crowd. One operating system.</div>
-                  <div className="text-[11px] text-cyan-400/70 italic">&quot;Nowhere to go? WhichWay AI knows.&quot;</div>
+                  <div className="text-[11px] text-cyan-400/70 italic">&quot;Not sure where to go? WhichWay AI knows.&quot;</div>
                 </div>
               </div>
               <div className="flex gap-2">

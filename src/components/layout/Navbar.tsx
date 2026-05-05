@@ -47,7 +47,7 @@ export default function Navbar() {
             <div className="font-extrabold tracking-tight text-white">
               TROPTIONS<span className="text-[10px] align-super text-slate-500">™</span> · <span className="text-cyan-400">WWAI</span>
             </div>
-            <div className="text-[10px] text-slate-500 tracking-widest uppercase">Nowhere to go? WhichWay AI knows.</div>
+            <div className="text-[10px] text-slate-500 tracking-widest uppercase">Not sure where to go? WhichWay AI knows.</div>
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-4 text-sm">

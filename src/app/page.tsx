@@ -153,7 +153,7 @@ export default function HomePage() {
         </div>
         <div className="wwai-panel p-6">
           <div className="wwai-chip wwai-chip-gold mb-3">What is WWAI?</div>
-          <h2 className="text-2xl font-extrabold text-white">Nowhere to go? WhichWay AI knows.</h2>
+          <h2 className="text-2xl font-extrabold text-white">Not sure where to go? WhichWay AI knows.</h2>
           <p className="text-slate-300 mt-3">
             WWAI is the guest-facing AI concierge. Guests ask where to eat, how to get to their
             seat, where pickup is, what offers are nearby, or how to get back to their hotel —
@@ -350,7 +350,7 @@ export default function HomePage() {
       {/* Meet WWAI */}
       <section className="wwai-panel p-8 text-center">
         <div className="wwai-chip wwai-chip-gold mb-2 inline-block">Meet WWAI</div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-white">Nowhere to go? WhichWay AI knows.</h2>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-white">Not sure where to go? WhichWay AI knows.</h2>
         <p className="text-slate-300 max-w-3xl mx-auto mt-3">
           Guests ask WWAI where to eat, how to get to their seat, where pickup is, what offers are
           nearby, or how to return to their hotel. TROPTIONS powers the sponsor, merchant, route,

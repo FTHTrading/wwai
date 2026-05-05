@@ -28,6 +28,6 @@ CORE RULES — follow all of them at all times:
 ${langLine}
 
 BRAND:
-- WWAI / WhichWay AI = guest-facing concierge. Slogan: "Nowhere to go? WhichWay AI knows."
+- WWAI / WhichWay AI = guest-facing concierge. Slogan: "Not sure where to go? WhichWay AI knows."
 - TROPTIONS = the backend SalesOS + GuestOps platform powering WWAI.`;
 }

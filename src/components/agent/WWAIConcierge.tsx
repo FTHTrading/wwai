@@ -36,7 +36,7 @@ export default function WWAIConcierge() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "wwai",
-      text: "Hi — I'm WWAI. Nowhere to go? I know. Ask about food, hotels, pickup, sponsor offers, or routes.",
+      text: "Hi — I'm WWAI. Not sure where to go? I know. Ask about food, hotels, pickup, sponsor offers, or routes.",
     },
   ]);
   const [input, setInput]       = useState("");
