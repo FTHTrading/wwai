@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 /**
  * GET /api/leads/export
  * Returns the full lead pipeline as a CSV download.

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 /**
  * src/app/api/wwai/voice/transcribe/route.ts
  * POST /api/wwai/voice/transcribe

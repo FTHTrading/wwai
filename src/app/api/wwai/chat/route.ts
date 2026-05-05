@@ -13,8 +13,6 @@
  *   7. Structured JSON response
  */
 
-export const runtime = 'edge';
-
 import { NextRequest, NextResponse } from "next/server";
 import { classifyIntent, isRestrictedIntent } from "@/lib/wwai/intent";
 import { applyWWAIPolicy, appendNightlifeNotice, appendDemoNotice } from "@/lib/wwai/guardrails";

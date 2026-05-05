@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 /**
  * src/app/api/wwai/status/route.ts
  * WWAI provider status — used by /agent-system and /settings/integrations

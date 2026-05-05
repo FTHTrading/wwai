@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { NextResponse } from "next/server";
 import { AI_PRESETS, getPresetPublic } from "@/lib/ai-prompts";
 

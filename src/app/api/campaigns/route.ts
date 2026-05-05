@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { NextRequest, NextResponse } from "next/server";
 import { listCampaigns, createCampaign } from "@/lib/campaigns";
 
