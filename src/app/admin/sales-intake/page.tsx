@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   getSalesIntakes,
@@ -11,9 +11,65 @@ import {
   STATUS_LABELS,
   STATUS_COLORS,
   REGISTRATION_TYPE_LABELS,
+  type RegistrationType,
 } from "@/lib/salesIntakeStorage";
 
-function loadIntakes(): SalesIntake[] {
+type StorageMode = "database" | "demo";
+
+// Server DTO shape returned by /api/sales-intake (subset of fields we use).
+interface ApiIntake {
+  id: string;
+  intakeId: string;
+  status: IntakeStatus;
+  registrationType: RegistrationType;
+  businessLegalName: string;
+  dbaName?: string | null;
+  einLastFour?: string | null;
+  businessAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+  contactFirstName: string;
+  contactLastName: string;
+  contactTitle?: string | null;
+  contactEmail: string;
+  contactPhone?: string | null;
+  packageId?: string | null;
+  packageName?: string | null;
+  interestedServices?: string[];
+  notes?: string | null;
+  adminNotes?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Map server DTO → the legacy localStorage shape so the rest of the UI is unchanged.
+function adaptApiIntake(api: ApiIntake): SalesIntake {
+  return {
+    id: api.intakeId,
+    registrationType: api.registrationType,
+    businessLegalName: api.businessLegalName,
+    dba: api.dbaName ?? undefined,
+    einLastFour: api.einLastFour ?? "",
+    street: api.businessAddress ?? "",
+    city: api.city ?? "",
+    state: api.state ?? "",
+    zip: api.zip ?? "",
+    firstName: api.contactFirstName,
+    lastName: api.contactLastName,
+    title: api.contactTitle ?? "",
+    email: api.contactEmail,
+    phone: api.contactPhone ?? "",
+    packageId: api.packageId ?? undefined,
+    interestedServices: api.interestedServices ?? [],
+    notes: api.notes ?? undefined,
+    adminNotes: api.adminNotes ?? undefined,
+    status: api.status,
+    createdAt: api.createdAt,
+  };
+}
+
+function loadLocalIntakes(): SalesIntake[] {
   if (typeof window === "undefined") return [];
   return getSalesIntakes().sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -21,23 +77,76 @@ function loadIntakes(): SalesIntake[] {
 }
 
 export default function SalesIntakeAdminPage() {
-  const [intakes, setIntakes] = useState<SalesIntake[]>(() => loadIntakes());
+  const [intakes, setIntakes] = useState<SalesIntake[]>([]);
   const [filter, setFilter] = useState<IntakeStatus | "all">("all");
   const [noteMap, setNoteMap] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const [storageMode, setStorageMode] = useState<StorageMode>("demo");
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  function reload() {
-    setIntakes(loadIntakes());
-  }
+  const reload = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const res = await fetch("/api/sales-intake?admin=1", { cache: "no-store" });
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      const data = (await res.json()) as {
+        storageMode?: StorageMode;
+        intakes?: ApiIntake[];
+      };
+      const mode: StorageMode = data.storageMode === "database" ? "database" : "demo";
+      setStorageMode(mode);
+      const apiIntakes = (data.intakes ?? []).map(adaptApiIntake);
+      if (mode === "database") {
+        setIntakes(apiIntakes);
+      } else {
+        // Demo mode: merge server-memory + browser localStorage so an admin
+        // can still review intakes submitted before a DB was attached.
+        const local = loadLocalIntakes();
+        const seen = new Set(apiIntakes.map((i) => i.id));
+        setIntakes([...apiIntakes, ...local.filter((i) => !seen.has(i.id))]);
+      }
+    } catch (err) {
+      // Fallback: API unreachable — read browser localStorage only.
+      console.warn("[admin/sales-intake] API unreachable, falling back to localStorage", err);
+      setStorageMode("demo");
+      setIntakes(loadLocalIntakes());
+      setLoadError("API unreachable — showing browser localStorage only.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial data fetch on mount. setState calls inside `reload` are
+    // intentional and run asynchronously after the fetch resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void reload();
+  }, [reload]);
 
   const filtered = filter === "all" ? intakes : intakes.filter((i) => i.status === filter);
 
-  function handleStatus(id: string, status: IntakeStatus) {
+  async function handleStatus(id: string, status: IntakeStatus) {
     const note = noteMap[id] ?? "";
     setSaving(id);
-    updateSalesIntakeStatus(id, status, note || undefined);
-    reload();
-    setSaving(null);
+    try {
+      // Always update localStorage (cheap + keeps demo summary working)
+      updateSalesIntakeStatus(id, status, note || undefined);
+      // Best-effort PATCH to API; ignore failure (handled by reload error path)
+      try {
+        await fetch(`/api/sales-intake/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status, adminNotes: note || undefined }),
+        });
+      } catch (err) {
+        console.warn("[admin/sales-intake] PATCH failed", err);
+      }
+      await reload();
+    } finally {
+      setSaving(null);
+    }
   }
 
   const STATUS_BTN_COLORS: Record<string, string> = {
@@ -52,20 +161,49 @@ export default function SalesIntakeAdminPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-white">Sales Intake Queue</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-3xl font-extrabold text-white">Sales Intake Queue</h1>
+            <span
+              className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border font-bold ${
+                storageMode === "database"
+                  ? "text-cyan-300 border-cyan-400/40 bg-cyan-400/10"
+                  : "text-amber-300 border-amber-400/40 bg-amber-400/10"
+              }`}
+              title={
+                storageMode === "database"
+                  ? "Reads/writes routed to the production database"
+                  : "Demo mode — server is using in-memory + browser localStorage"
+              }
+            >
+              {storageMode === "database" ? "Database storage" : "Demo storage"}
+            </span>
+          </div>
           <p className="text-slate-400 text-sm mt-1">Review and action submitted business registrations.</p>
+          {loadError && (
+            <p className="text-xs text-amber-300 mt-1">{loadError}</p>
+          )}
         </div>
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => void reload()}
+            disabled={loading}
+            className="wwai-btn-ghost text-sm disabled:opacity-50"
+          >
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
           <Link href="/sales-registration" className="wwai-btn-ghost text-sm">Registration Hub</Link>
           <Link href="/sales-deck" className="wwai-btn-ghost text-sm">Sales Deck</Link>
         </div>
       </div>
 
-      {/* Demo warning */}
+      {/* Storage warning */}
       <div className="wwai-panel border-yellow-500/30 bg-yellow-500/5 p-4 mb-6">
         <p className="text-sm text-yellow-300">
-          <strong>Demo Mode:</strong> Submissions are stored in your browser&apos;s localStorage only.
-          No production database is connected. This queue is for demo and sales workflow testing only.
+          <strong>{storageMode === "database" ? "Database mode:" : "Demo mode:"}</strong>{" "}
+          {storageMode === "database"
+            ? "Submissions are persisted in the application database. Do not enter real EINs or sensitive business data until production auth and encryption are enabled — see docs/AUTH_AND_DATABASE_PRODUCTION_PLAN.md."
+            : "Submissions are stored in your browser's localStorage and a server-memory store only. No persistent database is connected. This queue is for demo and sales workflow testing only."}
         </p>
       </div>
 

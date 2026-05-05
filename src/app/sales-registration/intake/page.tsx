@@ -79,6 +79,8 @@ function IntakeFormContent() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<SalesIntake | null>(null);
+  // "database" = persisted via /api/sales-intake; "demo" = browser-only localStorage
+  const [storageMode, setStorageMode] = useState<"database" | "demo">("demo");
 
   const filteredPackages = form.registrationType
     ? ALL_SALES_PACKAGES.filter((p) => p.category === form.registrationType)
@@ -119,32 +121,69 @@ function IntakeFormContent() {
     return Object.keys(errs).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
 
+    // Always keep a localStorage copy so the summary page works in either mode.
+    const localIntake = saveSalesIntake({
+      registrationType: form.registrationType as RegistrationType,
+      businessLegalName: form.businessLegalName.trim(),
+      dba: form.dba.trim() || undefined,
+      einRaw: form.ein.trim(),
+      street: form.street.trim(),
+      city: form.city.trim(),
+      state: form.state,
+      zip: form.zip.trim(),
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      title: form.title.trim(),
+      email: form.email.trim().toLowerCase(),
+      phone: form.phone.trim(),
+      packageId: form.packageId || undefined,
+      interestedServices: form.interestedServices,
+      notes: form.notes.trim() || undefined,
+    });
+
     try {
-      const intake = saveSalesIntake({
-        registrationType: form.registrationType as RegistrationType,
-        businessLegalName: form.businessLegalName.trim(),
-        dba: form.dba.trim() || undefined,
-        einRaw: form.ein.trim(),
-        street: form.street.trim(),
-        city: form.city.trim(),
-        state: form.state,
-        zip: form.zip.trim(),
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        title: form.title.trim(),
-        email: form.email.trim().toLowerCase(),
-        phone: form.phone.trim(),
-        packageId: form.packageId || undefined,
-        interestedServices: form.interestedServices,
-        notes: form.notes.trim() || undefined,
+      const res = await fetch("/api/sales-intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          registrationType: form.registrationType,
+          businessLegalName: form.businessLegalName.trim(),
+          dbaName: form.dba.trim() || undefined,
+          ein: form.ein.trim(),
+          businessAddress: form.street.trim() || undefined,
+          city: form.city.trim() || undefined,
+          state: form.state || undefined,
+          zip: form.zip.trim() || undefined,
+          contactFirstName: form.firstName.trim(),
+          contactLastName: form.lastName.trim(),
+          contactTitle: form.title.trim() || undefined,
+          contactEmail: form.email.trim().toLowerCase(),
+          contactPhone: form.phone.trim() || undefined,
+          packageId: form.packageId || undefined,
+          interestedServices: form.interestedServices,
+          notes: form.notes.trim() || undefined,
+        }),
       });
-      setSubmitted(intake);
+      if (res.ok) {
+        const data = (await res.json()) as {
+          storageMode?: "database" | "demo";
+          intake?: { intakeId?: string };
+        };
+        setStorageMode(data.storageMode === "database" ? "database" : "demo");
+      } else {
+        // Server rejected — keep localStorage fallback, surface as demo mode.
+        setStorageMode("demo");
+      }
+    } catch {
+      // Network failure — keep localStorage fallback, surface as demo mode.
+      setStorageMode("demo");
     } finally {
+      setSubmitted(localIntake);
       setSubmitting(false);
     }
   }
@@ -154,8 +193,19 @@ function IntakeFormContent() {
       <div className="max-w-2xl mx-auto">
         <div className="wwai-panel border-green-500/30 bg-green-500/5 p-6 mb-6">
           <div className="text-green-400 text-2xl mb-2">✓</div>
-          <div className="text-xs font-bold uppercase tracking-widest text-green-400 mb-1">
-            Demo Intake Submitted
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <div className="text-xs font-bold uppercase tracking-widest text-green-400">
+              Intake Submitted
+            </div>
+            <span
+              className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border font-bold ${
+                storageMode === "database"
+                  ? "text-cyan-300 border-cyan-400/40 bg-cyan-400/10"
+                  : "text-amber-300 border-amber-400/40 bg-amber-400/10"
+              }`}
+            >
+              {storageMode === "database" ? "Database storage" : "Demo storage"}
+            </span>
           </div>
           <h2 className="text-2xl font-extrabold text-white mb-1">Intake Received</h2>
           <p className="text-slate-300 text-sm mb-4">

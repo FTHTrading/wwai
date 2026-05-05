@@ -12,66 +12,66 @@ datasource db {
 // ── Users / Wallets ─────────────────────────────────────────────
 model User {
   id          String   @id @default(cuid())
-  address     String   @unique          // wallet public key / apostle agent UUID
-  chain       String   @default("apo")  // "apo" | "evm" | "sol"
+  address     String   @unique // wallet public key / apostle agent UUID
+  chain       String   @default("apo") // "apo" | "evm" | "sol"
   displayName String?
   createdAt   DateTime @default(now())
 
-  listings    Listing[]
-  bids        Bid[]
-  optionsBought  OptionContract[] @relation("Buyer")
-  optionsSold    OptionContract[] @relation("Seller")
+  listings      Listing[]
+  bids          Bid[]
+  optionsBought OptionContract[] @relation("Buyer")
+  optionsSold   OptionContract[] @relation("Seller")
 }
 
 // ── FIFA Player Cards ────────────────────────────────────────────
 model PlayerCard {
-  id          String   @id @default(cuid())
-  eaId        String   @unique          // EA FC / FIFA internal ID
-  name        String
-  club        String
-  league      String
-  nation      String
-  position    String
-  rating      Int
-  rarity      String   @default("gold") // gold | silver | bronze | special | icon | hero
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  eaId      String   @unique // EA FC / FIFA internal ID
+  name      String
+  club      String
+  league    String
+  nation    String
+  position  String
+  rating    Int
+  rarity    String   @default("gold") // gold | silver | bronze | special | icon | hero
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  listings    Listing[]
-  options     OptionContract[]
+  listings     Listing[]
+  options      OptionContract[]
   priceHistory PriceSnapshot[]
 }
 
 // ── Market Listings (buy/sell order book) ───────────────────────
 model Listing {
-  id          String   @id @default(cuid())
-  cardId      String
-  sellerId    String
-  price       Float                     // in ATP
-  currency    String   @default("ATP")
-  quantity    Int      @default(1)
-  status      String   @default("open") // open | filled | cancelled
-  txHash      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  cardId    String
+  sellerId  String
+  price     Float // in ATP
+  currency  String   @default("ATP")
+  quantity  Int      @default(1)
+  status    String   @default("open") // open | filled | cancelled
+  txHash    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  card        PlayerCard @relation(fields: [cardId], references: [id])
-  seller      User       @relation(fields: [sellerId], references: [id])
-  bids        Bid[]
+  card   PlayerCard @relation(fields: [cardId], references: [id])
+  seller User       @relation(fields: [sellerId], references: [id])
+  bids   Bid[]
 }
 
 model Bid {
-  id          String   @id @default(cuid())
-  listingId   String
-  bidderId    String
-  amount      Float
-  currency    String   @default("ATP")
-  status      String   @default("pending") // pending | accepted | rejected | expired
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  listingId String
+  bidderId  String
+  amount    Float
+  currency  String   @default("ATP")
+  status    String   @default("pending") // pending | accepted | rejected | expired
+  createdAt DateTime @default(now())
 
-  listing     Listing @relation(fields: [listingId], references: [id])
-  bidder      User    @relation(fields: [bidderId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
+  bidder  User    @relation(fields: [bidderId], references: [id])
 }
 
 // ── Options Contracts ────────────────────────────────────────────
@@ -80,30 +80,30 @@ model OptionContract {
   cardId          String
   buyerId         String
   sellerId        String
-  strikePrice     Float                         // ATP
-  premium         Float                         // ATP paid upfront
+  strikePrice     Float // ATP
+  premium         Float // ATP paid upfront
   currency        String   @default("ATP")
-  contractType    String   @default("call")     // call | put
+  contractType    String   @default("call") // call | put
   expiresAt       DateTime
-  status          String   @default("open")     // open | exercised | expired | cancelled
+  status          String   @default("open") // open | exercised | expired | cancelled
   exercisedTxHash String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  card    PlayerCard @relation(fields: [cardId], references: [id])
-  buyer   User       @relation("Buyer",  fields: [buyerId],  references: [id])
-  seller  User       @relation("Seller", fields: [sellerId], references: [id])
+  card   PlayerCard @relation(fields: [cardId], references: [id])
+  buyer  User       @relation("Buyer", fields: [buyerId], references: [id])
+  seller User       @relation("Seller", fields: [sellerId], references: [id])
 }
 
 // ── Price History ────────────────────────────────────────────────
 model PriceSnapshot {
-  id        String   @id @default(cuid())
-  cardId    String
-  price     Float
-  source    String   @default("market") // market | futbin | futwiz
+  id         String   @id @default(cuid())
+  cardId     String
+  price      Float
+  source     String   @default("market") // market | futbin | futwiz
   recordedAt DateTime @default(now())
 
-  card      PlayerCard @relation(fields: [cardId], references: [id])
+  card PlayerCard @relation(fields: [cardId], references: [id])
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -112,164 +112,164 @@ model PriceSnapshot {
 
 // ── Sponsors ─────────────────────────────────────────────────────
 model Sponsor {
-  id            String   @id @default(cuid())
-  name          String
-  contactName   String?
-  contactEmail  String?
-  contactPhone  String?
-  package       String   @default("smart")     // smart | cultural | rewards
-  status        String   @default("prospect")  // prospect | active | paused | closed
-  budget        Float?
-  industry      String?
-  website       String?
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  package      String   @default("smart") // smart | cultural | rewards
+  status       String   @default("prospect") // prospect | active | paused | closed
+  budget       Float?
+  industry     String?
+  website      String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  campaigns     Campaign[]
-  leads         Lead[]
-  proposals     Proposal[]
-  invoices      Invoice[]
+  campaigns Campaign[]
+  leads     Lead[]
+  proposals Proposal[]
+  invoices  Invoice[]
 }
 
 // ── Venues ───────────────────────────────────────────────────────
 model Venue {
-  id            String   @id @default(cuid())
-  name          String
-  address       String?
-  city          String   @default("Atlanta")
-  lat           Float?
-  lng           Float?
-  category      String   @default("general") // stadium | hotel | transit | entertainment | food | retail | general
-  capacity      Int?
-  contactName   String?
-  contactEmail  String?
-  contactPhone  String?
-  status        String   @default("prospect") // prospect | onboarded | active | inactive
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  address      String?
+  city         String   @default("Atlanta")
+  lat          Float?
+  lng          Float?
+  category     String   @default("general") // stadium | hotel | transit | entertainment | food | retail | general
+  capacity     Int?
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  status       String   @default("prospect") // prospect | onboarded | active | inactive
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  campaigns     Campaign[]
-  leads         Lead[]
-  proposals     Proposal[]
+  campaigns Campaign[]
+  leads     Lead[]
+  proposals Proposal[]
 }
 
 // ── Campaigns ────────────────────────────────────────────────────
 model Campaign {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   sponsorId   String?
   venueId     String?
-  type        String   @default("qr")    // qr | offer | event | digital
-  status      String   @default("draft") // draft | active | paused | completed
+  type        String    @default("qr") // qr | offer | event | digital
+  status      String    @default("draft") // draft | active | paused | completed
   startDate   DateTime?
   endDate     DateTime?
   budget      Float?
-  impressions Int      @default(0)
-  clicks      Int      @default(0)
-  redemptions Int      @default(0)
+  impressions Int       @default(0)
+  clicks      Int       @default(0)
+  redemptions Int       @default(0)
   notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  sponsor     Sponsor?  @relation(fields: [sponsorId], references: [id])
-  venue       Venue?    @relation(fields: [venueId],   references: [id])
-  qrCodes     QrCode[]
+  sponsor Sponsor? @relation(fields: [sponsorId], references: [id])
+  venue   Venue?   @relation(fields: [venueId], references: [id])
+  qrCodes QrCode[]
 }
 
 // ── QR Codes & Redemptions ───────────────────────────────────────
 model QrCode {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   campaignId  String
-  code        String   @unique @default(cuid())
+  code        String    @unique @default(cuid())
   label       String?
   offerText   String?
   rewardValue Float?
-  rewardType  String   @default("discount") // discount | points | free_item | cashback
-  scans       Int      @default(0)
-  redemptions Int      @default(0)
-  active      Boolean  @default(true)
+  rewardType  String    @default("discount") // discount | points | free_item | cashback
+  scans       Int       @default(0)
+  redemptions Int       @default(0)
+  active      Boolean   @default(true)
   expiresAt   DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
-  campaign    Campaign  @relation(fields: [campaignId], references: [id])
-  events      QrEvent[]
+  campaign Campaign  @relation(fields: [campaignId], references: [id])
+  events   QrEvent[]
 }
 
 model QrEvent {
-  id         String   @id @default(cuid())
-  qrCodeId   String
-  eventType  String   @default("scan") // scan | redeem | share
-  ipHash     String?  // SHA-256 hashed for privacy
-  userAgent  String?
-  location   String?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  qrCodeId  String
+  eventType String   @default("scan") // scan | redeem | share
+  ipHash    String? // SHA-256 hashed for privacy
+  userAgent String?
+  location  String?
+  createdAt DateTime @default(now())
 
-  qrCode     QrCode   @relation(fields: [qrCodeId], references: [id])
+  qrCode QrCode @relation(fields: [qrCodeId], references: [id])
 }
 
 // ── Sponsor Packages ─────────────────────────────────────────────
 model SponsorPackage {
-  id              String   @id @default(cuid())
-  slug            String   @unique           // local-venue | category | city-activation | premium | enterprise
-  name            String
-  tagline         String?
-  monthlyFee      Float
-  setupFee        Float    @default(0)
-  campaignLimit   Int      @default(1)
-  qrLimit         Int      @default(5)
-  venuePlacementLimit Int  @default(1)
-  reportingLevel  String   @default("basic") // basic | standard | advanced | enterprise
-  includedServices String? // JSON-serialized array stored as string
-  featured        Boolean  @default(false)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  slug                String   @unique // local-venue | category | city-activation | premium | enterprise
+  name                String
+  tagline             String?
+  monthlyFee          Float
+  setupFee            Float    @default(0)
+  campaignLimit       Int      @default(1)
+  qrLimit             Int      @default(5)
+  venuePlacementLimit Int      @default(1)
+  reportingLevel      String   @default("basic") // basic | standard | advanced | enterprise
+  includedServices    String? // JSON-serialized array stored as string
+  featured            Boolean  @default(false)
+  sortOrder           Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  proposals       Proposal[]
+  proposals Proposal[]
 }
 
 // ── Proposals ────────────────────────────────────────────────────
 model Proposal {
-  id              String   @id @default(cuid())
-  sponsorId       String?
-  packageId       String?
-  venueId         String?
-  campaignType    String   @default("qr")
-  termMonths      Int      @default(12)
-  customBudget    Float?
-  estimatedROI    Float?
-  notes           String?
-  status          String   @default("draft") // draft | sent | accepted | declined
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  sponsorId    String?
+  packageId    String?
+  venueId      String?
+  campaignType String   @default("qr")
+  termMonths   Int      @default(12)
+  customBudget Float?
+  estimatedROI Float?
+  notes        String?
+  status       String   @default("draft") // draft | sent | accepted | declined
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  sponsor         Sponsor?        @relation(fields: [sponsorId], references: [id])
-  package         SponsorPackage? @relation(fields: [packageId], references: [id])
-  venue           Venue?          @relation(fields: [venueId],   references: [id])
-  invoices        Invoice[]
+  sponsor  Sponsor?        @relation(fields: [sponsorId], references: [id])
+  package  SponsorPackage? @relation(fields: [packageId], references: [id])
+  venue    Venue?          @relation(fields: [venueId], references: [id])
+  invoices Invoice[]
 }
 
 // ── Invoices ──────────────────────────────────────────────────────
 model Invoice {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   sponsorId       String?
   proposalId      String?
-  invoiceNumber   String   @unique
+  invoiceNumber   String    @unique
   amount          Float
-  currency        String   @default("USD")
+  currency        String    @default("USD")
   description     String?
-  status          String   @default("draft") // draft | sent | paid | overdue | void
+  status          String    @default("draft") // draft | sent | paid | overdue | void
   dueDate         DateTime?
   paidAt          DateTime?
-  paymentProvider String?  // square | stripe | manual
+  paymentProvider String? // square | stripe | manual
   paymentRef      String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  sponsor         Sponsor?  @relation(fields: [sponsorId], references: [id])
-  proposal        Proposal? @relation(fields: [proposalId], references: [id])
+  sponsor  Sponsor?  @relation(fields: [sponsorId], references: [id])
+  proposal Proposal? @relation(fields: [proposalId], references: [id])
 }
 
 // ── Leads ────────────────────────────────────────────────────────
@@ -281,14 +281,121 @@ model Lead {
   phone          String?
   company        String?
   message        String?
-  source         String   @default("web")  // web | qr | referral | cold
-  status         String   @default("new")  // new | contacted | qualified | converted | lost
+  source         String   @default("web") // web | qr | referral | cold
+  status         String   @default("new") // new | contacted | qualified | converted | lost
   estimatedValue Float?
   sponsorId      String?
   venueId        String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  sponsor        Sponsor? @relation(fields: [sponsorId], references: [id])
-  venue          Venue?   @relation(fields: [venueId],   references: [id])
+  sponsor Sponsor? @relation(fields: [sponsorId], references: [id])
+  venue   Venue?   @relation(fields: [venueId], references: [id])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHASE 5 — SALES INTAKE / BUSINESS REGISTRATION
+// (Demo-safe schema. Full EIN never stored — only last 4.)
+// ═══════════════════════════════════════════════════════════════
+
+// ── Sales Intake ─────────────────────────────────────────────────
+// Demo-safe registration record. Only the last 4 EIN digits are persisted.
+// Full EIN storage requires encrypted field handling and compliance review
+// before being added to this model.
+model SalesIntake {
+  id               String @id @default(cuid())
+  intakeId         String @unique // human-readable (WWAI-YYYYMMDD-XXXX)
+  registrationType String // restaurant-bar | hotel | driver-transportation | sponsor | venue | sales-partner
+  status           String @default("pending-review") // pending-review | approved | needs-info | rejected
+
+  // Business
+  businessLegalName String
+  dbaName           String?
+  einLastFour       String? // demo-only — last 4 digits, never the full EIN
+  businessAddress   String?
+  city              String?
+  state             String?
+  zip               String?
+  website           String?
+  businessCategory  String?
+
+  // Contact
+  contactFirstName String
+  contactLastName  String
+  contactTitle     String?
+  contactEmail     String
+  contactPhone     String?
+
+  // Package interest
+  packageId          String?
+  packageName        String?
+  salesTerritory     String?
+  estimatedBudget    Float?
+  interestedServices String? // JSON-encoded string array
+  notes              String?
+
+  // Admin workflow
+  adminNotes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviewEvents AdminReviewEvent[]
+  proposals    SalesProposal[]
+  contacts     BusinessContact[]
+}
+
+// ── Business Contacts (additional contacts beyond primary) ───────
+model BusinessContact {
+  id        String   @id @default(cuid())
+  intakeId  String
+  firstName String
+  lastName  String
+  title     String?
+  email     String
+  phone     String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  intake SalesIntake @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+}
+
+// ── Sales Proposals (registration-specific proposals) ────────────
+// Distinct from the existing sponsor-side Proposal model. Tracks the
+// proposal generated from a SalesIntake or by a sales rep for a registered
+// business.
+model SalesProposal {
+  id            String    @id @default(cuid())
+  intakeId      String?
+  packageId     String?
+  packageName   String?
+  termMonths    Int       @default(12)
+  monthlyAmount Float?
+  setupAmount   Float?
+  totalAmount   Float?
+  currency      String    @default("USD")
+  status        String    @default("draft") // draft | sent | accepted | declined | expired
+  notes         String?
+  sentAt        DateTime?
+  acceptedAt    DateTime?
+  declinedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  intake SalesIntake? @relation(fields: [intakeId], references: [id], onDelete: SetNull)
+}
+
+// ── Admin Review Events (audit trail) ────────────────────────────
+model AdminReviewEvent {
+  id         String   @id @default(cuid())
+  intakeId   String
+  action     String // status-change | note-added | assigned | flagged
+  fromStatus String?
+  toStatus   String?
+  note       String?
+  actorId    String? // future: auth user id
+  actorEmail String? // future: auth user email
+  createdAt  DateTime @default(now())
+
+  intake SalesIntake @relation(fields: [intakeId], references: [id], onDelete: Cascade)
 }

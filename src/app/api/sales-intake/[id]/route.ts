@@ -1,42 +1,98 @@
+/**
+ * /api/sales-intake/[id] — fetch (GET) + status update (PATCH)
+ *
+ * Accepts either the database row id (cuid) or the human-readable
+ * intakeId (WWAI-YYYYMMDD-XXXX) as the path param.
+ */
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getSalesIntakeById,
+  updateSalesIntakeStatus,
+  publicView,
+  isValidStatus,
+  type IntakeStatus,
+} from "@/lib/storage/intakeRepository";
 
-// Demo mode: same in-memory references are not shared across modules.
-// In production, replace with Prisma lookup by ID.
+export const dynamic = "force-dynamic";
+
 export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   if (!id) {
     return NextResponse.json({ error: "id required" }, { status: 400 });
   }
-  // Demo: cannot retrieve from server-side memory across requests without a DB.
-  // Client should use localStorage via salesIntakeStorage.ts for demo lookups.
+  const { searchParams } = new URL(req.url);
+  const includeAdmin = searchParams.get("admin") === "1";
+
+  const { intake, storageMode } = await getSalesIntakeById(decodeURIComponent(id));
+  if (!intake) {
+    return NextResponse.json(
+      { storageMode, error: "Intake not found" },
+      { status: 404 },
+    );
+  }
   return NextResponse.json({
-    id,
-    message:
-      "Demo mode: intake detail is stored client-side. Use localStorage/salesIntakeStorage for client reads. Connect a database for server-side persistence.",
+    storageMode,
+    intake: includeAdmin ? intake : publicView(intake),
   });
 }
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   if (!id) {
     return NextResponse.json({ error: "id required" }, { status: 400 });
   }
-  const body = await req.json() as { status?: string; adminNotes?: string };
-  const allowedStatuses = ["pending-review", "approved", "needs-info", "rejected"];
-  if (body.status && !allowedStatuses.includes(body.status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+
+  let body: { status?: string; adminNotes?: string };
+  try {
+    body = (await req.json()) as { status?: string; adminNotes?: string };
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
-  return NextResponse.json({
-    id,
-    status: body.status || "pending-review",
-    adminNotes: body.adminNotes || "",
-    updatedAt: new Date().toISOString(),
-    message: "Demo mode: status update acknowledged. Connect a database for persistent updates.",
-  });
+
+  if (!body.status || !isValidStatus(body.status)) {
+    return NextResponse.json(
+      {
+        error:
+          "Invalid status. Must be one of: pending-review, approved, needs-info, rejected",
+      },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { intake, storageMode } = await updateSalesIntakeStatus(
+      decodeURIComponent(id),
+      body.status as IntakeStatus,
+      body.adminNotes,
+      // TODO: replace with auth user once production auth is wired:
+      undefined,
+    );
+    if (!intake) {
+      return NextResponse.json(
+        { storageMode, error: "Intake not found" },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      storageMode,
+      intake,
+      message:
+        storageMode === "database"
+          ? "Status updated and audit event recorded."
+          : "Demo mode: status updated in memory. Connect a database for persistent updates.",
+    });
+  } catch (err) {
+    console.error("[sales-intake PATCH]", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to update status" },
+      { status: 500 },
+    );
+  }
 }
