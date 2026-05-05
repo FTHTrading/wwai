@@ -22,11 +22,15 @@ const SECONDARY = [
   { href: "/drivers",    label: "Drivers" },
   { href: "/campaigns",  label: "Campaigns" },
   { href: "/analytics",  label: "Analytics" },
-  { href: "/proposals",  label: "Proposals" },
-  { href: "/billing",    label: "Billing" },
-  { href: "/admin",      label: "Admin" },
-  { href: "/contact",    label: "Contact" },
-  { href: "/launch",     label: "Launch" },
+  { href: "/sales-registration", label: "Sales Registration" },
+  { href: "/sales-deck",         label: "Sales Deck" },
+  { href: "/sales-documents",    label: "Sales Documents" },
+  { href: "/sales-partners",     label: "Sales Partners" },
+  { href: "/proposals",          label: "Proposals" },
+  { href: "/billing",            label: "Billing" },
+  { href: "/admin",              label: "Admin" },
+  { href: "/contact",            label: "Contact" },
+  { href: "/launch",             label: "Launch" },
 ];
 
 export default function Navbar() {

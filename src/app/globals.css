@@ -483,6 +483,14 @@ body {
 .hud-grid-bg { background-image: radial-gradient(circle at 25% 25%, rgba(0,213,255,0.06), transparent 60%), linear-gradient(rgba(0,213,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,213,255,0.04) 1px, transparent 1px); background-size: auto, 40px 40px, 40px 40px; }
 .disclaimer-bar { font-size:.7rem; color:#7c8aa0; border:1px solid #162035; background:#0a1220; padding:.5rem .8rem; border-radius:.5rem; }
 
+/* ── Form controls ────────────────────────────────────────────────────── */
+.form-label { display:block; font-size:.75rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+.form-input { background:#080e1a; border:1px solid #1a2540; color:#f0f4ff; border-radius:.6rem; padding:.55rem .85rem; font-size:.875rem; transition:border-color .2s, box-shadow .2s; outline:none; }
+.form-input:focus { border-color:rgba(0,213,255,.55); box-shadow:0 0 0 2px rgba(0,213,255,.12); }
+.form-input::placeholder { color:#3d4e6a; }
+select.form-input { cursor:pointer; }
+textarea.form-input { min-height:7rem; line-height:1.6; }
+
 /* ─────────────────────────────────────────────
    Print styles — proposal export
    ───────────────────────────────────────────── */
