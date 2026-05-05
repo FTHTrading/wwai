@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="theme-color" content="#020611" />
       </head>
       <body className="min-h-full flex flex-col bg-[#020611] text-slate-100">
+        <LanguageProvider>
         <Navbar />
         <main className="container mx-auto px-4 py-8 flex-1">{children}</main>
         <footer className="border-t border-[#0d1626] bg-[#040910] mt-12">
@@ -85,6 +87,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </div>
           </div>
         </footer>
+        </LanguageProvider>
       </body>
     </html>
   );

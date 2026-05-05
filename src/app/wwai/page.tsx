@@ -1,5 +1,5 @@
 import AppShell from "@/components/layout/AppShell";
-import WWAIConcierge from "@/components/agent/WWAIConcierge";
+import WWAIVoiceConcierge from "@/components/agent/WWAIVoiceConcierge";
 
 export default function WWAIPage() {
   return (
@@ -19,7 +19,7 @@ export default function WWAIPage() {
             className="object-contain drop-shadow-[0_0_30px_rgba(0,213,255,0.45)]"
           />
         </div>
-        <WWAIConcierge />
+        <WWAIVoiceConcierge />
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
