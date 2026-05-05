@@ -12,14 +12,15 @@
     "db:reset:demo": "prisma migrate reset --force && npx tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "deploy:vercel": "npx vercel deploy --prod=false --yes",
-    "deploy:vercel:prod": "npx vercel deploy --prod --yes",
+    "deploy:cf": "npx @cloudflare/next-on-pages@1 && npx wrangler pages deploy .vercel/output/static --project-name=troptions-fifa",
+    "deploy:cf:preview": "npx @cloudflare/next-on-pages@1 && npx wrangler pages deploy .vercel/output/static --project-name=troptions-fifa --branch=preview",
     "deploy": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 -Prod",
     "deploy:preview": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1",
     "preflight": "powershell -ExecutionPolicy Bypass -File scripts/preflight.ps1",
     "smoke": "powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1",
     "release:vercel": "pwsh -ExecutionPolicy Bypass -File scripts/vercel-release.ps1",
     "deploy:check": "npm run preflight && npm run lint && npx tsc --noEmit && npm run build",
+    "test:wwai": "pwsh -ExecutionPolicy Bypass -File scripts/test-wwai.ps1",
     "postinstall": "prisma generate",
     "ai:health": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/health-check.ps1",
     "ai:test:nim": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/test-nim-chat.ps1",
@@ -41,6 +42,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -48,6 +50,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^3.114.17"
   }
 }

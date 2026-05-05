@@ -1,6 +1,9 @@
-name: deploy-vercel
+# REMOVED — deployment moved to Cloudflare Pages.
+# See .github/workflows/deploy-cloudflare.yml
+#
+# Vercel required 3 account-level secrets and a Vercel account sign-up.
+# Cloudflare Pages deploys directly from GitHub with a single CF API token.
 
-# Requires three repository secrets:
 #   VERCEL_TOKEN      — from https://vercel.com/account/tokens
 #   VERCEL_ORG_ID     — from .vercel/project.json after `vercel link`
 #   VERCEL_PROJECT_ID — from .vercel/project.json after `vercel link`

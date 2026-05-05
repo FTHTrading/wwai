@@ -1,0 +1,85 @@
+name: deploy-cloudflare-pages
+
+# Deploys to Cloudflare Pages on every push to main.
+# No Vercel account required — all deployment happens via Cloudflare.
+#
+# Required repository secrets (Settings → Secrets → Actions):
+#   CF_API_TOKEN   — Cloudflare API token
+#                   Create at: https://dash.cloudflare.com/profile/api-tokens
+#                   Template: "Cloudflare Pages — Edit" permission
+#   CF_ACCOUNT_ID  — Your Cloudflare account ID
+#                   Find at: dash.cloudflare.com → right sidebar when viewing Workers & Pages
+#
+# Cloudflare Pages env vars (set once in CF Dashboard, NOT here):
+#   DEMO_ACCESS_CODE       — server-only demo gate (NEVER set as NEXT_PUBLIC_)
+#   OPENAI_API_KEY         — WWAI AI concierge
+#   OPENAI_MODEL           — gpt-4o-mini (or your choice)
+#   DEEPGRAM_KEY           — Voice TTS/STT
+#   DEEPGRAM_KEY_ALT       — Deepgram failover key
+#   DATABASE_URL           — LibSQL/Turso URL (file: URL for dev, libsql:// for production)
+#   DATABASE_AUTH_TOKEN    — Turso auth token (production only)
+#   NEXT_PUBLIC_MAP_PROVIDER — maplibre
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deploy environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - preview
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    # Skips silently when CF secrets are not yet configured.
+    if: ${{ secrets.CF_API_TOKEN != '' && secrets.CF_ACCOUNT_ID != '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for Cloudflare Pages
+        env:
+          # Build-time env vars only — secrets stay in Cloudflare dashboard
+          DEMO_ACCESS_CODE: ${{ secrets.DEMO_ACCESS_CODE }}
+          NEXT_PUBLIC_MAP_PROVIDER: maplibre
+          NODE_ENV: production
+        run: npx @cloudflare/next-on-pages@1
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: troptions-fifa
+          directory: .vercel/output/static
+          # Creates a GitHub deployment record + commit status check
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          # Deploy to production on main push; preview for workflow_dispatch preview
+          branch: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment == 'preview') && 'preview' || 'main' }}
+
+      - name: Deploy summary
+        if: always()
+        run: |
+          echo "## Cloudflare Pages Deploy" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Project: troptions-fifa" >> $GITHUB_STEP_SUMMARY
+          echo "- Live URL: https://troptions-fifa.pages.dev" >> $GITHUB_STEP_SUMMARY
