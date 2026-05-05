@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TROPTIONS · WWAI — Event City SalesOS + Guest Concierge</title>
+  <meta name="description" content="WWAI (WhichWay AI) is the AI concierge for event cities — finding restaurants, hotels, pickup zones, sponsor offers, and safety-informed routes. Powered by TROPTIONS." />
+  <meta property="og:title" content="TROPTIONS · WWAI" />
+  <meta property="og:description" content="Not sure where to go? WhichWay AI knows. Event city AI concierge — food, hotels, bars, pickup, routes, 8 languages." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://troptions-fifa.pages.dev/" />
+  <!-- Auto-redirect after 3s -->
+  <meta http-equiv="refresh" content="3; url=https://troptions-fifa.pages.dev/" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #020611;
+      --panel:    #070e1c;
+      --border:   #0d1626;
+      --cyan:     #00d5ff;
+      --gold:     #f5c842;
+      --slate:    #94a3b8;
+      --white:    #f1f5f9;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .logo-ring {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      background: rgba(0, 213, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--cyan);
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 40px rgba(0, 213, 255, 0.3);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(0, 213, 255, 0.3); }
+      50%       { box-shadow: 0 0 60px rgba(0, 213, 255, 0.6); }
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 span { color: var(--cyan); }
+
+    .slogan {
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      color: var(--gold);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .feature {
+      background: rgba(0, 213, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .feature-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-desc {
+      font-size: 0.7rem;
+      color: var(--slate);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--cyan);
+      color: #020611;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      margin-bottom: 1rem;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+
+    .redirect-notice {
+      font-size: 0.75rem;
+      color: var(--slate);
+      margin-top: 1.5rem;
+    }
+
+    .redirect-notice a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .chip {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--slate);
+      background: rgba(255,255,255,0.03);
+    }
+    .chip-cyan { border-color: rgba(0,213,255,0.5); color: var(--cyan); }
+    .chip-gold { border-color: rgba(245,200,66,0.5); color: var(--gold); }
+
+    .powered {
+      font-size: 0.7rem;
+      color: var(--slate);
+      margin-top: 2rem;
+    }
+    .powered strong { color: var(--white); }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      border-radius: 999px;
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 999px;
+      animation: fill 3s linear forwards;
+    }
+    @keyframes fill {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-ring">W</div>
+
+  <h1>TROPTIONS<sup style="font-size:0.4em;color:#64748b;vertical-align:super">™</sup> · <span>WWAI</span></h1>
+  <p class="slogan">"Not sure where to go? WhichWay AI knows."</p>
+
+  <div class="card">
+    <div class="chips">
+      <span class="chip chip-cyan">AI Concierge</span>
+      <span class="chip chip-cyan">8 Languages</span>
+      <span class="chip chip-cyan">Voice Ready</span>
+      <span class="chip chip-gold">Demo Build</span>
+      <span class="chip">Powered by TROPTIONS</span>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-title">Restaurants &amp; Food</div>
+        <div class="feature-desc">Nearest verified venues with QR offers</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Hotels &amp; Routes</div>
+        <div class="feature-desc">Hotel→Seat and Seat→Hotel safety routes</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Pickup &amp; Transport</div>
+        <div class="feature-desc">Zone map, ETAs, driver connections</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Sponsor Offers</div>
+        <div class="feature-desc">TROPTIONS-powered local business deals</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">8-Language Voice</div>
+        <div class="feature-desc">Deepgram STT + TTS — text always works</div>
+      </div>
+      <div class="feature">
+        <div class="feature-title">Safety-Informed</div>
+        <div class="feature-desc">Operator-reviewed corridors in demo data</div>
+      </div>
+    </div>
+
+    <a href="https://troptions-fifa.pages.dev/" class="btn-primary">
+      Launch App →
+    </a>
+    <br />
+    <a href="https://troptions-fifa.pages.dev/wwai" class="btn-primary" style="background:transparent;border:1px solid rgba(0,213,255,0.5);color:var(--cyan);padding:0.6rem 1.5rem;font-size:0.85rem;">
+      Try WWAI Concierge
+    </a>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar"></div>
+    </div>
+    <p class="redirect-notice">
+      Redirecting automatically in 3 seconds…<br />
+      <a href="https://troptions-fifa.pages.dev/">Click here if not redirected</a>
+    </p>
+  </div>
+
+  <p class="powered">
+    <strong>TROPTIONS SalesOS</strong> — Independent AI + Blockchain platform for event cities.<br />
+    Not affiliated with any protected sports league, event, team, or venue unless separately licensed.
+  </p>
+
+</body>
+</html>
