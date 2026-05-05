@@ -8,12 +8,11 @@
 # First-time setup (run once before this script):
 #   vercel login
 #   vercel link --yes --project wwai
-#   vercel env add DEMO_ACCESS_CODE production        # enter your private code when prompted
-#   vercel env add NEXT_PUBLIC_MAP_PROVIDER production # enter: maplibre
 #
 # SECURITY:
 #   - DEMO_ACCESS_CODE is server-only. Never NEXT_PUBLIC_DEMO_ACCESS_CODE.
-#   - This script never reads, prints, or stores secret values.
+#   - This script prompts securely for DEMO_ACCESS_CODE if it is missing.
+#   - The value is piped directly to the Vercel CLI — never stored on disk.
 #   - .vercel/project.json is NOT committed (gitignored).
 
 [CmdletBinding()]
@@ -35,84 +34,79 @@ try {
     # ── 2. Vercel CLI check ───────────────────────────────────────────────────
     if (-not (Get-Command vercel -ErrorAction SilentlyContinue)) {
         Write-Host ""
-        Write-Host "[release] Vercel CLI not found." -ForegroundColor Red
-        Write-Host "  Install it with: npm i -g vercel" -ForegroundColor Yellow
+        Write-Host "[release] Vercel CLI not found. Install with: npm i -g vercel" -ForegroundColor Red
         exit 1
     }
 
     # ── 3. Auth check ─────────────────────────────────────────────────────────
     Write-Host "[release] Checking Vercel auth..." -ForegroundColor Cyan
     $whoami = vercel whoami 2>&1
-    if ($LASTEXITCODE -ne 0 -or $whoami -match "Error|not logged") {
-        Write-Host ""
-        Write-Host "[release] Not logged into Vercel." -ForegroundColor Red
-        Write-Host "  Run: vercel login" -ForegroundColor Yellow
+    if ($LASTEXITCODE -ne 0 -or "$whoami" -match "Error|not logged") {
+        Write-Host "[release] Not logged into Vercel. Run: vercel login" -ForegroundColor Red
         exit 1
     }
     Write-Host "[release] Logged in as: $whoami" -ForegroundColor Green
 
     # ── 4. Link check ─────────────────────────────────────────────────────────
     if (-not (Test-Path ".vercel/project.json")) {
-        Write-Host "[release] No .vercel/project.json. Linking to wwai..." -ForegroundColor Yellow
+        Write-Host "[release] No .vercel/project.json — linking to wwai..." -ForegroundColor Yellow
         vercel link --yes --project wwai
         if ($LASTEXITCODE -ne 0) {
-            Write-Host ""
-            Write-Host "[release] Vercel link failed." -ForegroundColor Red
-            Write-Host "  Run: vercel login" -ForegroundColor Yellow
-            Write-Host "  Then: vercel link --yes --project wwai" -ForegroundColor Yellow
+            Write-Host "[release] Vercel link failed. Run: vercel login  then: vercel link --yes --project wwai" -ForegroundColor Red
             exit 1
         }
     } else {
         Write-Host "[release] Vercel project linked." -ForegroundColor Green
     }
 
-    # ── 5. Env var check ──────────────────────────────────────────────────────
+    # ── 5. Env var check and auto-set ─────────────────────────────────────────
     Write-Host "[release] Checking Vercel production env vars..." -ForegroundColor Cyan
     $envList = vercel env ls production 2>&1
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[release] Could not list Vercel env vars (continuing with warning)." -ForegroundColor Yellow
+        Write-Host "[release] Could not list env vars (continuing)." -ForegroundColor Yellow
         $envList = ""
     }
 
-    $missingEnv = $false
-
-    if ($envList -notmatch "DEMO_ACCESS_CODE") {
+    # DEMO_ACCESS_CODE — prompt securely, pipe to vercel CLI
+    if ("$envList" -notmatch "DEMO_ACCESS_CODE") {
         Write-Host ""
-        Write-Host "[release] DEMO_ACCESS_CODE is missing in Vercel production." -ForegroundColor Red
-        Write-Host "  Run: vercel env add DEMO_ACCESS_CODE production" -ForegroundColor Yellow
-        Write-Host "  Enter your private demo code when prompted." -ForegroundColor Yellow
-        Write-Host "  (Do NOT put this value in NEXT_PUBLIC_DEMO_ACCESS_CODE — it would leak to the browser.)" -ForegroundColor Yellow
-        $missingEnv = $true
+        Write-Host "[release] DEMO_ACCESS_CODE is not set in Vercel production." -ForegroundColor Yellow
+        Write-Host "  This is the code clients type at /demo-access." -ForegroundColor Cyan
+        Write-Host "  Server-only — never appears in the browser bundle." -ForegroundColor Cyan
+        Write-Host ""
+        $secureCode = Read-Host "  Enter DEMO_ACCESS_CODE (input hidden)" -AsSecureString
+        # Convert SecureString to plain text only for piping — never printed or stored
+        $credential = [System.Net.NetworkCredential]::new("", $secureCode)
+        $codeValue  = $credential.Password
+        if ([string]::IsNullOrWhiteSpace($codeValue)) {
+            Write-Host "[release] No value entered. Run 'vercel env add DEMO_ACCESS_CODE production' manually." -ForegroundColor Red
+            exit 1
+        }
+        $codeValue | vercel env add DEMO_ACCESS_CODE production
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[release] Failed to set DEMO_ACCESS_CODE. Run manually: vercel env add DEMO_ACCESS_CODE production" -ForegroundColor Red
+            exit 1
+        }
+        $codeValue = $null  # clear from memory
+        $credential = $null
+        Write-Host "[release] DEMO_ACCESS_CODE set in production." -ForegroundColor Green
     } else {
         Write-Host "[release] DEMO_ACCESS_CODE is set in production." -ForegroundColor Green
     }
 
-    if ($envList -notmatch "NEXT_PUBLIC_MAP_PROVIDER") {
-        Write-Host ""
-        Write-Host "[release] NEXT_PUBLIC_MAP_PROVIDER is missing. Attempting to set it..." -ForegroundColor Yellow
-        # Use a temp file to avoid pipe encoding issues with vercel CLI
-        $tmpVal = [System.IO.Path]::GetTempFileName()
-        Set-Content -Path $tmpVal -Value "maplibre" -NoNewline
-        vercel env add NEXT_PUBLIC_MAP_PROVIDER production < $tmpVal
-        Remove-Item $tmpVal -ErrorAction SilentlyContinue
+    # NEXT_PUBLIC_MAP_PROVIDER — set automatically, no secret
+    if ("$envList" -notmatch "NEXT_PUBLIC_MAP_PROVIDER") {
+        Write-Host "[release] NEXT_PUBLIC_MAP_PROVIDER missing — setting to 'maplibre'..." -ForegroundColor Yellow
+        "maplibre" | vercel env add NEXT_PUBLIC_MAP_PROVIDER production
         if ($LASTEXITCODE -ne 0) {
-            Write-Host ""
             Write-Host "[release] Could not auto-set NEXT_PUBLIC_MAP_PROVIDER." -ForegroundColor Yellow
-            Write-Host "  Run manually: vercel env add NEXT_PUBLIC_MAP_PROVIDER production" -ForegroundColor Yellow
-            Write-Host "  Value: maplibre" -ForegroundColor Yellow
-            $missingEnv = $true
-        } else {
-            Write-Host "[release] NEXT_PUBLIC_MAP_PROVIDER set to 'maplibre'." -ForegroundColor Green
+            Write-Host "  Run: vercel env add NEXT_PUBLIC_MAP_PROVIDER production  (value: maplibre)" -ForegroundColor Yellow
+            Write-Host "  Then re-run: npm run release:vercel" -ForegroundColor Yellow
+            exit 1
         }
+        Write-Host "[release] NEXT_PUBLIC_MAP_PROVIDER set to 'maplibre'." -ForegroundColor Green
     } else {
         Write-Host "[release] NEXT_PUBLIC_MAP_PROVIDER is set in production." -ForegroundColor Green
-    }
-
-    if ($missingEnv) {
-        Write-Host ""
-        Write-Host "[release] Required env vars are missing. Set them above, then re-run:" -ForegroundColor Red
-        Write-Host "  npm run release:vercel" -ForegroundColor Yellow
-        exit 1
     }
 
     # ── 6. Build checks ───────────────────────────────────────────────────────
@@ -124,7 +118,7 @@ try {
     Write-Host "[release] Typecheck..." -ForegroundColor Cyan
     npx tsc --noEmit
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "[release] tsc reported issues. If only from .next/dev/types/validator.ts, safe to continue." -ForegroundColor Yellow
+        Write-Host "[release] tsc issues detected. If only .next/dev/types/validator.ts — safe to continue." -ForegroundColor Yellow
     }
 
     Write-Host "[release] Build..." -ForegroundColor Cyan
@@ -143,9 +137,7 @@ try {
     # ── 8. Extract deployment URL ─────────────────────────────────────────────
     $deployedUrl = $null
     foreach ($line in $deployOutput) {
-        # Vercel prints lines like:  Production: https://wwai-xxxx.vercel.app [1m]
-        # or just bare https URLs
-        if ($line -match "https://[a-z0-9\-]+\.vercel\.app") {
+        if ("$line" -match "https://[a-z0-9\-]+\.vercel\.app") {
             $deployedUrl = $Matches[0].TrimEnd(".")
             break
         }
@@ -153,12 +145,12 @@ try {
 
     if (-not $deployedUrl) {
         Write-Host ""
-        Write-Host "[release] Could not auto-extract deploy URL from output:" -ForegroundColor Yellow
+        Write-Host "[release] Could not auto-extract deploy URL. Deploy output:" -ForegroundColor Yellow
         Write-Host $deployOutput
         Write-Host ""
         Write-Host "[release] Copy the URL above and run:" -ForegroundColor Yellow
-        Write-Host "  .\scripts\smoke.ps1 -BaseUrl `"https://YOUR-URL.vercel.app`"" -ForegroundColor Yellow
-        Write-Host "  Share: https://YOUR-URL.vercel.app/client-demo" -ForegroundColor Cyan
+        Write-Host "  .\scripts\smoke.ps1 -BaseUrl `"https://wwai-<hash>.vercel.app`"" -ForegroundColor Yellow
+        Write-Host "  Share: https://wwai-<hash>.vercel.app/client-demo" -ForegroundColor Cyan
         exit 0
     }
 
@@ -179,12 +171,12 @@ try {
     Write-Host ""
     Write-Host " REMINDER: Rotate DEMO_ACCESS_CODE after external demos." -ForegroundColor Yellow
     Write-Host "   Vercel Dashboard -> Project -> Settings -> Environment Variables" -ForegroundColor Yellow
-    Write-Host "   Then redeploy to activate the new code." -ForegroundColor Yellow
+    Write-Host "   Then redeploy (push to main or run npm run deploy)." -ForegroundColor Yellow
     Write-Host "============================================================" -ForegroundColor Cyan
     Write-Host ""
 
     if ($smokeExit -ne 0) {
-        Write-Host "[release] Smoke test reported failures. Review before sharing the demo URL." -ForegroundColor Red
+        Write-Host "[release] Smoke test reported failures. Review before sharing." -ForegroundColor Red
         exit 1
     }
 
