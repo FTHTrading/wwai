@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from "next/server";
 import { listSponsors, createSponsor } from "@/lib/sponsors";
 

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import AppShell from "@/components/layout/AppShell";
 import DemoWarning from "@/components/layout/DemoWarning";
 import { getSystemReadiness, type ProviderReadiness } from "@/lib/env";

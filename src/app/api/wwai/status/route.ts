@@ -1,9 +1,9 @@
+export const runtime = 'edge';
+
 /**
  * src/app/api/wwai/status/route.ts
  * WWAI provider status — used by /agent-system and /settings/integrations
  */
-
-export const runtime = 'nodejs';
 
 import { NextResponse } from "next/server";
 import { isOpenAIConfigured, isOllamaConfigured, getProviderPriority } from "@/lib/wwai/providers";

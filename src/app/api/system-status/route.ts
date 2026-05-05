@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * GET /api/system-status
  * Returns full system readiness for the settings/integrations page.

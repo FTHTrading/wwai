@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * GET /api/payment-status
  * Returns payment provider readiness (no secret values).

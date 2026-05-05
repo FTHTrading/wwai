@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from "next/server";
 import { localAiChat, AiMessage } from "@/lib/ai";
 import { getPreset } from "@/lib/ai-prompts";

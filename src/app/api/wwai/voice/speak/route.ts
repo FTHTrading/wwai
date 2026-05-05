@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * src/app/api/wwai/voice/speak/route.ts
  * POST /api/wwai/voice/speak
@@ -10,8 +12,6 @@
  *
  * NEVER exposes DEEPGRAM_API_KEY to the client.
  */
-
-export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { synthesizeSpeech, isDeepgramConfigured } from "@/lib/voice/deepgram";

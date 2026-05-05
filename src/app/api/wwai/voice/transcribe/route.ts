@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * src/app/api/wwai/voice/transcribe/route.ts
  * POST /api/wwai/voice/transcribe
@@ -12,8 +14,6 @@
  *
  * NEVER exposes DEEPGRAM_API_KEY to the client.
  */
-
-export const runtime = "nodejs"; // needs Buffer/ArrayBuffer; not edge
 
 import { NextRequest, NextResponse } from "next/server";
 import { transcribeAudio, isDeepgramConfigured } from "@/lib/voice/deepgram";

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server";
 import { TSN_NAMESPACES, TSN_CHAIN_ID, tsnRpcCall } from "@/lib/tsn";
 
