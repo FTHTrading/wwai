@@ -7,6 +7,7 @@ import { useState } from "react";
 const PRIMARY = [
   { href: "/",                 label: "Home" },
   { href: "/wwai",             label: "WWAI" },
+  { href: "/whichway",         label: "Brand" },
   { href: "/demo",             label: "Demo" },
   { href: "/packages",         label: "Packages" },
   { href: "/area-guide",       label: "Area Guide" },
