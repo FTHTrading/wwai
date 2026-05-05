@@ -17,7 +17,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { WWAI_PRESETS } from "@/data/demoData";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
-import { SITE_LANGUAGES } from "@/lib/i18n/languages";
 import type { WWAIChatResponse } from "@/app/api/wwai/chat/route";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -62,7 +61,11 @@ export default function WWAIVoiceConcierge() {
   const [error,        setError]        = useState<string | null>(null);
   const [recordState,  setRecordState]  = useState<RecordState>("idle");
   const [voiceReady,   setVoiceReady]   = useState<boolean | null>(null);  // null = checking
-  const [mediaSupported, setMediaSupported] = useState(true);
+  // Lazy-init mediaSupported so we don't call setState in an effect.
+  const [mediaSupported] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return !!(window.MediaRecorder && navigator.mediaDevices?.getUserMedia);
+  });
   const [playingIdx,   setPlayingIdx]   = useState<number | null>(null);
   const [status,       setStatus]       = useState<{
     deepgramConfigured: boolean;
@@ -79,13 +82,9 @@ export default function WWAIVoiceConcierge() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Check MediaRecorder availability + fetch status
+  // Fetch WWAI status (async — setState inside .then is allowed by the rule).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!window.MediaRecorder || !navigator.mediaDevices?.getUserMedia) {
-      setMediaSupported(false);
-    }
-    // Fetch WWAI status
     fetch("/api/wwai/status")
       .then((r) => r.json())
       .then((s) => {
@@ -132,37 +131,7 @@ export default function WWAIVoiceConcierge() {
   }, [loading, lang]);
 
   // ── Voice input ───────────────────────────────────────────────────────────
-  const startRecording = useCallback(async () => {
-    if (!mediaSupported) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-          ? "audio/webm;codecs=opus"
-          : "audio/webm",
-      });
-      chunksRef.current = [];
-      mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-      mr.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        setRecordState("processing");
-        await handleAudioBlob(new Blob(chunksRef.current, { type: mr.mimeType }), mr.mimeType);
-        setRecordState("idle");
-      };
-      mr.start();
-      mediaRef.current = mr;
-      setRecordState("recording");
-    } catch {
-      setError("Could not access microphone. Check browser permissions.");
-    }
-  }, [mediaSupported]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const stopRecording = useCallback(() => {
-    mediaRef.current?.stop();
-    mediaRef.current = null;
-  }, []);
-
-  const handleAudioBlob = async (blob: Blob, mimeType: string) => {
+  const handleAudioBlob = useCallback(async (blob: Blob) => {
     const form = new FormData();
     form.append("audio", blob, "recording.webm");
     form.append("language", lang);
@@ -212,9 +181,37 @@ export default function WWAIVoiceConcierge() {
     } finally {
       setLoading(false);
     }
+  }, [lang]);
 
-    void mimeType; // suppress unused warning
-  };
+  const startRecording = useCallback(async () => {
+    if (!mediaSupported) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? "audio/webm;codecs=opus"
+          : "audio/webm",
+      });
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      mr.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        setRecordState("processing");
+        await handleAudioBlob(new Blob(chunksRef.current, { type: mr.mimeType }));
+        setRecordState("idle");
+      };
+      mr.start();
+      mediaRef.current = mr;
+      setRecordState("recording");
+    } catch {
+      setError("Could not access microphone. Check browser permissions.");
+    }
+  }, [mediaSupported, handleAudioBlob]);
+
+  const stopRecording = useCallback(() => {
+    mediaRef.current?.stop();
+    mediaRef.current = null;
+  }, []);
 
   // ── TTS playback ──────────────────────────────────────────────────────────
   const playResponse = useCallback(async (text: string, idx: number) => {

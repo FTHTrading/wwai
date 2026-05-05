@@ -11,15 +11,16 @@
 import {
   createContext,
   useContext,
-  useState,
   useEffect,
   useCallback,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { getLanguage, SITE_LANGUAGES, type SiteLanguage } from "@/lib/i18n/languages";
 import { buildTranslator, type DictionaryKey } from "@/lib/i18n/dictionary";
 
 const STORAGE_KEY = "wwai_language";
+const CHANGE_EVENT = "wwai-language-change";
 
 interface LanguageContextValue {
   lang:        string;
@@ -39,28 +40,45 @@ const LanguageContext = createContext<LanguageContextValue>({
   languages:   SITE_LANGUAGES,
 });
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<string>("en");
+// External store for language — keeps localStorage as the source of truth
+// without violating react-hooks/set-state-in-effect.
+function subscribe(cb: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", cb);
+  window.addEventListener(CHANGE_EVENT, cb);
+  return () => {
+    window.removeEventListener("storage", cb);
+    window.removeEventListener(CHANGE_EVENT, cb);
+  };
+}
 
-  // Restore from localStorage on mount (client only)
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved && SITE_LANGUAGES.some((l) => l.code === saved)) {
-        setLang(saved);
-      }
-    } catch {
-      // localStorage unavailable (SSR / private browsing)
-    }
-  }, []);
+function getSnapshot(): string {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && SITE_LANGUAGES.some((l) => l.code === saved)) return saved;
+  } catch {
+    // localStorage unavailable
+  }
+  return "en";
+}
+
+function getServerSnapshot(): string {
+  return "en";
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const setLanguage = useCallback((code: string) => {
-    const found = SITE_LANGUAGES.find((l) => l.code === code);
-    if (!found) return;
-    setLang(code);
+    if (!SITE_LANGUAGES.some((l) => l.code === code)) return;
     try {
       localStorage.setItem(STORAGE_KEY, code);
-    } catch { /* ignore */ }
+    } catch {
+      // ignore
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(CHANGE_EVENT));
+    }
   }, []);
 
   // Apply dir + lang to <html> whenever language changes

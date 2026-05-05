@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   getSalesIntakes,
@@ -13,20 +13,22 @@ import {
   REGISTRATION_TYPE_LABELS,
 } from "@/lib/salesIntakeStorage";
 
+function loadIntakes(): SalesIntake[] {
+  if (typeof window === "undefined") return [];
+  return getSalesIntakes().sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
 export default function SalesIntakeAdminPage() {
-  const [intakes, setIntakes] = useState<SalesIntake[]>([]);
+  const [intakes, setIntakes] = useState<SalesIntake[]>(() => loadIntakes());
   const [filter, setFilter] = useState<IntakeStatus | "all">("all");
   const [noteMap, setNoteMap] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
   function reload() {
-    const all = getSalesIntakes();
-    setIntakes(all.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    setIntakes(loadIntakes());
   }
-
-  useEffect(() => {
-    reload();
-  }, []);
 
   const filtered = filter === "all" ? intakes : intakes.filter((i) => i.status === filter);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -17,18 +17,14 @@ import { getPackageById } from "@/data/salesPackages";
 export default function SalesIntakeSummaryPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [intake, setIntake] = useState<SalesIntake | null>(null);
-  const [notFound, setNotFound] = useState(false);
-
-  useEffect(() => {
-    if (!id) return;
-    const found = getSalesIntakeById(decodeURIComponent(id));
-    if (found) {
-      setIntake(found);
-    } else {
-      setNotFound(true);
+  // Lazy-init from storage so we don't call setState in an effect.
+  const [{ intake, notFound }] = useState<{ intake: SalesIntake | null; notFound: boolean }>(() => {
+    if (!id || typeof window === "undefined") {
+      return { intake: null, notFound: false };
     }
-  }, [id]);
+    const found = getSalesIntakeById(decodeURIComponent(id));
+    return found ? { intake: found, notFound: false } : { intake: null, notFound: true };
+  });
 
   if (notFound) {
     return (

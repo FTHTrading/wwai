@@ -1,4 +1,3 @@
-import AppShell from "@/components/layout/AppShell";
 import Link from "next/link";
 import {
   RESTAURANT_BAR_PACKAGES,
