@@ -67,19 +67,29 @@ try {
         $envList = ""
     }
 
-    # DEMO_ACCESS_CODE — prompt securely, pipe to vercel CLI
+    # DEMO_ACCESS_CODE — use system env var if set, otherwise prompt securely
     if ("$envList" -notmatch "DEMO_ACCESS_CODE") {
         Write-Host ""
         Write-Host "[release] DEMO_ACCESS_CODE is not set in Vercel production." -ForegroundColor Yellow
-        Write-Host "  This is the code clients type at /demo-access." -ForegroundColor Cyan
-        Write-Host "  Server-only — never appears in the browser bundle." -ForegroundColor Cyan
-        Write-Host ""
-        $secureCode = Read-Host "  Enter DEMO_ACCESS_CODE (input hidden)" -AsSecureString
-        # Convert SecureString to plain text only for piping — never printed or stored
-        $credential = [System.Net.NetworkCredential]::new("", $secureCode)
-        $codeValue  = $credential.Password
+
+        if (-not [string]::IsNullOrWhiteSpace($env:DEMO_ACCESS_CODE)) {
+            # Non-interactive: use system env var
+            Write-Host "[release] Using DEMO_ACCESS_CODE from system environment." -ForegroundColor Cyan
+            $codeValue = $env:DEMO_ACCESS_CODE
+        } else {
+            # Interactive fallback: secure prompt
+            Write-Host "  This is the code clients type at /demo-access." -ForegroundColor Cyan
+            Write-Host "  Server-only — never appears in the browser bundle." -ForegroundColor Cyan
+            Write-Host "  Tip: set `$env:DEMO_ACCESS_CODE before running to skip this prompt." -ForegroundColor Cyan
+            Write-Host ""
+            $secureCode = Read-Host "  Enter DEMO_ACCESS_CODE (input hidden)" -AsSecureString
+            $credential = [System.Net.NetworkCredential]::new("", $secureCode)
+            $codeValue  = $credential.Password
+            $credential = $null
+        }
+
         if ([string]::IsNullOrWhiteSpace($codeValue)) {
-            Write-Host "[release] No value entered. Run 'vercel env add DEMO_ACCESS_CODE production' manually." -ForegroundColor Red
+            Write-Host "[release] No value available. Set `$env:DEMO_ACCESS_CODE or run 'vercel env add DEMO_ACCESS_CODE production' manually." -ForegroundColor Red
             exit 1
         }
         $codeValue | vercel env add DEMO_ACCESS_CODE production
@@ -87,8 +97,7 @@ try {
             Write-Host "[release] Failed to set DEMO_ACCESS_CODE. Run manually: vercel env add DEMO_ACCESS_CODE production" -ForegroundColor Red
             exit 1
         }
-        $codeValue = $null  # clear from memory
-        $credential = $null
+        $codeValue = $null
         Write-Host "[release] DEMO_ACCESS_CODE set in production." -ForegroundColor Green
     } else {
         Write-Host "[release] DEMO_ACCESS_CODE is set in production." -ForegroundColor Green

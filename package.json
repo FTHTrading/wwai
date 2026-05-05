@@ -18,7 +18,7 @@
     "deploy:preview": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1",
     "preflight": "powershell -ExecutionPolicy Bypass -File scripts/preflight.ps1",
     "smoke": "powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1",
-    "release:vercel": "powershell -ExecutionPolicy Bypass -File scripts/vercel-release.ps1",
+    "release:vercel": "pwsh -ExecutionPolicy Bypass -File scripts/vercel-release.ps1",
     "deploy:check": "npm run preflight && npm run lint && npx tsc --noEmit && npm run build",
     "postinstall": "prisma generate",
     "ai:health": "powershell -ExecutionPolicy Bypass -File ./ops/local-ai/health-check.ps1",
