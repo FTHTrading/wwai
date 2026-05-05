@@ -168,7 +168,7 @@ try {
     # ── 9. Smoke test ─────────────────────────────────────────────────────────
     Write-Host ""
     Write-Host "[release] Running smoke test against $deployedUrl..." -ForegroundColor Cyan
-    powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1 -BaseUrl $deployedUrl
+    pwsh -ExecutionPolicy Bypass -File scripts/smoke.ps1 -BaseUrl $deployedUrl
     $smokeExit = $LASTEXITCODE
 
     # ── 10. Final output ──────────────────────────────────────────────────────
